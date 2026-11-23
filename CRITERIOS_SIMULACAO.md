@@ -24,7 +24,8 @@ A temporada **não é simulada de uma vez**. O dono da sala clica em "Simular pr
 
 ## 4. Gols esperados (xG)
 - Base: 1,3 gol por time.
-- `xG = 1,3 × e^((ofensivo do time − defensivo do adversário) / 16)`.
+- `xG = 1,3 × e^((ofensivo do time − defensivo do adversário) / 11)`.
+- O divisor era 16; em 23/11/2026 o peso do over foi aumentado um pouco (divisor 11): um time com 5 pontos de over a mais passa a vencer cerca de 9 pontos percentuais a mais, sem eliminar zebras nem empates.
 - **Mando de campo**: mandante ×1,12, visitante ÷1,12.
 - **Forma recente** (pontos nos últimos 5 jogos): de ×0,95 (nenhum ponto) até ×1,05 (5 vitórias).
 - Limites: entre 0,15 e 4,5 gols esperados.
