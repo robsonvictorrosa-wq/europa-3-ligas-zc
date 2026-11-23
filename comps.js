@@ -2,7 +2,7 @@
 const E=require('./europa');
 const {leagueSchedule}=require('./leaguesched');
 
-// Sequência de 61 jornadas (ver DECISOES.md). mid após a 29ª (liga nacional R19).
+// Sequência de 65 jornadas (ver DECISOES.md). mid após a 29ª (liga nacional R19).
 function buildPlan(){
  const p=[];
  const L=(r)=>p.push({kind:'league',round:r,label:`Liga nacional – rodada ${r}`});
@@ -12,12 +12,14 @@ function buildPlan(){
  for(let i=0;i<8;i++){L(2*i+1);L(2*i+2);U(i+1);}
  C('prelim',1);L(17);C('prelim',2);L(18);L(19);
  const midAfter=p.length; // 29
- C('r16',1);L(20);C('r16',2);L(21);
- EK('qf',1);L(22);EK('qf',2);L(23);
- C('qf',1);L(24);C('qf',2);L(25);
- EK('sf',1);L(26);EK('sf',2);L(27);
- C('sf',1);L(28);C('sf',2);
- for(let r=29;r<=38;r++)L(r);
+ EK('playoff',1);L(20);EK('playoff',2);L(21);
+ EK('r16',1);L(22);EK('r16',2);L(23);
+ C('r16',1);L(24);C('r16',2);L(25);
+ EK('qf',1);L(26);EK('qf',2);L(27);
+ C('qf',1);L(28);C('qf',2);
+ EK('sf',1);L(29);EK('sf',2);L(30);
+ C('sf',1);L(31);C('sf',2);
+ for(let r=32;r<=38;r++)L(r);
  EK('final',1);C('final',1);C('final',2);
  return p.map((x,i)=>({...x,matchday:i+1,mid_after:i+1===midAfter}));
 }
@@ -100,4 +102,19 @@ function nationalSchedules(clubsByLeague,strength,seed=1){
  return out;
 }
 
-module.exports={PLAN,TOTAL_MD,MID_MD,LEAGUE_ROUNDS,buildPlan,europeLeaguePhase,cupPairsPrelim,cupPairsR16,twoLegs,nationalSchedules};
+
+// Mata-mata europeu: 9º×24º … 16º×17º na repescagem (ida na casa do pior);
+// top 8 direto nas oitavas contra os vencedores (1×W16/17 … 8×W9/24).
+function europePlayoffPairs(ranked){ // ranked[0]=1º da fase de liga
+ const p=[];for(let i=0;i<8;i++)p.push([ranked[8+i],ranked[23-i]]);
+ return p;
+}
+function europeR16Pairs(top8,playoffWinners){ // winners[0]=W9/24 … [7]=W16/17
+ return top8.map((id,i)=>[id,playoffWinners[7-i]]);
+}
+function europeQfPairs(r16Winners){ // ordem das oitavas: caminho do 1º, do 2º, … do 8º
+ const w=r16Winners;
+ return [[w[0],w[7]],[w[3],w[4]],[w[1],w[6]],[w[2],w[5]]];
+}
+
+module.exports={PLAN,TOTAL_MD,MID_MD,LEAGUE_ROUNDS,buildPlan,europeLeaguePhase,cupPairsPrelim,cupPairsR16,europePlayoffPairs,europeR16Pairs,europeQfPairs,twoLegs,nationalSchedules};

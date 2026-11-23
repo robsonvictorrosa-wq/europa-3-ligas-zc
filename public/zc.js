@@ -70,7 +70,7 @@ async function campeonato(step){if(!await need('campeonato'))return;const c=OV.c
 // ---------- JOGOS / TABELA ----------
 let FX=null,FXt=0;async function zfx(){if(!FX||Date.now()-FXt>60e3){FX=await get(R()+'/zc/fixtures');FXt=Date.now()}return FX}
 const brt=iso=>new Date(iso).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-const STG={league:'Rodada',playin:'Playoffs',r16:'Oitavas',qf:'Quartas',sf:'Semifinal',final:'Final'};
+const STG={league:'Rodada',prelim:'Preliminar',playoff:'Repescagem',playin:'Playoffs',r16:'Oitavas',qf:'Quartas',sf:'Semifinal',final:'Final'};
 async function jogos(sel){if(!await need('jogos'))return;let d;try{d=await zfx()}catch(e){app.innerHTML=empty('Erro ao carregar os jogos',esc(e.message));return}
  const mc=myClub(),my=mc&&mc.id,rs=d.rounds||[];const lr=rs.filter(x=>x.stage==='league').length;
  let r=+sel;if(!r){const nx=rs.find(x=>x.games.length&&x.games.some(g=>!g.played));r=nx?nx.round:1}

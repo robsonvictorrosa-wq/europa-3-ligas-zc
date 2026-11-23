@@ -114,7 +114,7 @@ const root=path.join(__dirname,'..');
 
   // calendário e início da temporada
   const prev=await ok('GET','/api/rooms/LIGA/zc/admin/season/preview?start=2027-07-01');
-  assert.strictEqual(prev.total_matchdays,61);
+  assert.strictEqual(prev.total_matchdays,65);
   await ok('POST','/api/rooms/LIGA/zc/admin/season/agenda',{start:'2027-07-01',auto:false});
   await ok('POST','/api/rooms/LIGA/season/start',{confirm:true});
   const season=await ok('GET','/api/rooms/LIGA/season');
@@ -124,7 +124,7 @@ const root=path.join(__dirname,'..');
   assert.ok(season.competitions.find(c=>c.kind==='ucl'&&c.name==='Champions League'));
 
   const fx=await ok('GET','/api/rooms/LIGA/zc/fixtures');
-  assert.strictEqual(fx.total,61);
+  assert.strictEqual(fx.total,65);
   assert.ok(fx.rounds[0].games.length>=20); // 3 ligas, 10 jogos cada = 30; preview may include only leagues on md1
 
   // simular jornada 1 (3 ligas)
@@ -161,7 +161,7 @@ const root=path.join(__dirname,'..');
   assert.ok(br.stages.find(s=>s.key==='prelim'),'FA Cup deve ter preliminar');
 
   // simular o resto da temporada (pode levar uns minutos)
-  console.log('simulando o restante das 61 jornadas…');
+  console.log('simulando o restante das 65 jornadas…');
   let st=await ok('GET','/api/rooms/LIGA/season');
   let guard=0;
   while(st.status==='season'&&guard<80){
@@ -170,7 +170,7 @@ const root=path.join(__dirname,'..');
     if(r.matchday%10===0||r.results?.some(x=>x.info))console.log('  jornada',r.matchday, (r.results||[]).filter(x=>x.info).map(x=>x.info).join(' | '));
     st=await ok('GET','/api/rooms/LIGA/season');
   }
-  assert.strictEqual(st.status,'finished','temporada deveria terminar após 61 jornadas');
+  assert.strictEqual(st.status,'finished','temporada deveria terminar após 65 jornadas');
   const cupsDone=st.competitions.filter(c=>c.kind==='cup');
   assert.ok(cupsDone.every(c=>c.champion),'todas as copas com campeão');
   assert.ok(st.competitions.find(c=>c.kind==='ucl').champion,'Champions com campeão');

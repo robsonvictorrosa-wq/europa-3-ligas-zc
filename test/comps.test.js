@@ -30,10 +30,24 @@ const H=new Map();
 for(const g of R){assert.strictEqual(g.length,10);for(const [h] of g)H.set(h,(H.get(h)||0)+1);}
 for(const id of clubs)assert.strictEqual(H.get(id),19);
 
-assert.strictEqual(C.TOTAL_MD,61);
+assert.strictEqual(C.TOTAL_MD,65);
 assert.strictEqual(C.MID_MD,29);
 assert.strictEqual(C.PLAN.filter(s=>s.kind==='league').length,38);
 assert.strictEqual(C.PLAN.filter(s=>s.kind==='europe_lp').length,8);
+assert.strictEqual(C.PLAN.filter(s=>s.kind==='europe_ko'&&s.stage==='playoff').length,2);
+assert.strictEqual(C.PLAN.filter(s=>s.kind==='europe_ko'&&s.stage==='r16').length,2);
+assert.strictEqual(C.PLAN.filter(s=>s.kind==='europe_ko'&&s.stage==='qf').length,2);
+assert.strictEqual(C.PLAN.filter(s=>s.kind==='europe_ko'&&s.stage==='sf').length,2);
+assert.strictEqual(C.PLAN.filter(s=>s.kind==='europe_ko'&&s.stage==='final').length,1);
+const ranked=[...Array(30)].map((_,i)=>1000+i); // 0=1º
+const po=C.europePlayoffPairs(ranked);
+assert.deepStrictEqual(po[0],[1008,1023]); // 9º×24º
+assert.deepStrictEqual(po[7],[1015,1016]); // 16º×17º
+const r16e=C.europeR16Pairs(ranked.slice(0,8),[201,202,203,204,205,206,207,208]);
+assert.deepStrictEqual(r16e[0],[1000,208]); // 1º × W16/17
+assert.deepStrictEqual(r16e[7],[1007,201]); // 8º × W9/24
+const qfe=C.europeQfPairs([11,12,13,14,15,16,17,18]);
+assert.deepStrictEqual(qfe,[[11,18],[14,15],[12,17],[13,16]]);
 
 const seeded=[...Array(20)].map((_,i)=>100+i); // 0=melhor
 const pre=C.cupPairsPrelim(seeded);

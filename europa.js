@@ -5,7 +5,7 @@ const CFG={
  LEAGUE_ROUNDS:38,
  TURNO1_END:19,
  EUROPE_LP:8,          // fase de liga: 8 jogos
- EUROPE_KO_FROM:8,     // top 8 nas quartas (8 times; ver DECISOES.md)
+ EUROPE_KO_FROM:8,     // top 8 direto nas oitavas; 9º–24º na repescagem
  KO_TWO_LEGS:true,
  FINAL_SINGLE:true,    // finais europeias em jogo único; copas nacionais: ida e volta inclusive a final
  CUP_FINAL_TWO_LEGS:true,
@@ -16,7 +16,7 @@ const loadClubs=uni=>{CLUBS=uni.prepare('SELECT club_id FROM lib_clubs ORDER BY 
 const VPOS=['GOL','LD','ZAG','ZAG','LE','VOL','MC','MEI','PD','PE','ATA','GOL','ZAG','MC','ATA','LE'];
 const virtualSquad=clubId=>VPOS.map((pos,i)=>({id:-(clubId*100+i+1),name:'Provisório '+pos+(i>=11?' (res.)':''),primary_position:pos,positions:[pos],overall:CF.placeholder_ovr,age:25,stats:{},virtual:true}));
 const STAGE_NAMES={
- league:'Fase de liga',lp:'Fase de liga',prelim:'Preliminar',r16:'Oitavas de final',
+ league:'Fase de liga',lp:'Fase de liga',prelim:'Preliminar',playoff:'Repescagem',r16:'Oitavas de final',
  qf:'Quartas de final',sf:'Semifinal',final:'Final'
 };
 const N_CLUBS=CF.clubs.length;

@@ -253,30 +253,48 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
     const comp=comps.find(x=>x.kind===kind);if(!comp)continue;
     const [ex]=(await c.query("SELECT 1 FROM matches WHERE comp_id=$1 AND stage=$2 LIMIT 1",[comp.id,step.stage])).rows;
     if(ex)continue;
-    if(step.stage==='qf'){
+    const rnd={playoff:[9,10],r16:[11,12],qf:[13,14],sf:[15,16],final:[17,17]};
+    const [r1,r2]=rnd[step.stage]||[0,0];
+    if(step.stage==='playoff'){
      const ms=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND played AND stage='league'",[comp.id])).rows;
      const ids=[...new Set(ms.flatMap(m=>[m.home,m.away]))];
      const tb=E.standings(ms,ids,id=>club(id).name);
-     const top=tb.slice(0,8).map(t=>t.club_id);
-     if(top.length<8)return;
-     // 1x8, 4x5, 2x7, 3x6
-     const pairs=[[top[0],top[7]],[top[3],top[4]],[top[1],top[6]],[top[2],top[5]]];
+     if(tb.length<24)return;
+     const pairs=C.europePlayoffPairs(tb.map(t=>t.club_id));
      const legs=C.twoLegs(pairs,0,true);
-     await insertMatches(c,legs.ida.map(g=>[comp.id,9,g.home,g.away,'qf',1,g.tie,false]));
-     await insertMatches(c,legs.volta.map(g=>[comp.id,10,g.home,g.away,'qf',2,g.tie,false]));
-    }else{
-     const from=step.stage==='sf'?'qf':'sf';
-     const prev=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND stage=$2 AND winner IS NOT NULL",[comp.id,from])).rows;
+     await insertMatches(c,legs.ida.map(g=>[comp.id,r1,g.home,g.away,'playoff',1,g.tie,false]));
+     await insertMatches(c,legs.volta.map(g=>[comp.id,r2,g.home,g.away,'playoff',2,g.tie,false]));
+    }else if(step.stage==='r16'){
+     const ms=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND played AND stage='league'",[comp.id])).rows;
+     const ids=[...new Set(ms.flatMap(m=>[m.home,m.away]))];
+     const top=E.standings(ms,ids,id=>club(id).name).slice(0,8).map(t=>t.club_id);
+     const prev=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND stage='playoff' AND winner IS NOT NULL",[comp.id])).rows;
      const w=prev.filter(m=>m.leg===2).sort((a,b)=>a.tie-b.tie).map(m=>m.winner);
-     if(step.stage==='sf'&&w.length===4){
-      const pairs=[[w[0],w[1]],[w[2],w[3]]];
-      const legs=C.twoLegs(pairs,0,true);
-      await insertMatches(c,legs.ida.map(g=>[comp.id,11,g.home,g.away,'sf',1,g.tie,false]));
-      await insertMatches(c,legs.volta.map(g=>[comp.id,12,g.home,g.away,'sf',2,g.tie,false]));
-     }
-     if(step.stage==='final'&&w.length===2){
-      await insertMatches(c,[[comp.id,13,w[0],w[1],'final',1,0,true]]);
-     }
+     if(top.length<8||w.length<8)return;
+     const pairs=C.europeR16Pairs(top,w);
+     const legs=C.twoLegs(pairs,0,true);
+     await insertMatches(c,legs.ida.map(g=>[comp.id,r1,g.home,g.away,'r16',1,g.tie,false]));
+     await insertMatches(c,legs.volta.map(g=>[comp.id,r2,g.home,g.away,'r16',2,g.tie,false]));
+    }else if(step.stage==='qf'){
+     const prev=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND stage='r16' AND winner IS NOT NULL",[comp.id])).rows;
+     const w=prev.filter(m=>m.leg===2).sort((a,b)=>a.tie-b.tie).map(m=>m.winner);
+     if(w.length<8)return;
+     const pairs=C.europeQfPairs(w);
+     const legs=C.twoLegs(pairs,0,true);
+     await insertMatches(c,legs.ida.map(g=>[comp.id,r1,g.home,g.away,'qf',1,g.tie,false]));
+     await insertMatches(c,legs.volta.map(g=>[comp.id,r2,g.home,g.away,'qf',2,g.tie,false]));
+    }else if(step.stage==='sf'){
+     const prev=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND stage='qf' AND winner IS NOT NULL",[comp.id])).rows;
+     const w=prev.filter(m=>m.leg===2).sort((a,b)=>a.tie-b.tie).map(m=>m.winner);
+     if(w.length!==4)return;
+     const pairs=[[w[0],w[1]],[w[2],w[3]]];
+     const legs=C.twoLegs(pairs,0,true);
+     await insertMatches(c,legs.ida.map(g=>[comp.id,r1,g.home,g.away,'sf',1,g.tie,false]));
+     await insertMatches(c,legs.volta.map(g=>[comp.id,r2,g.home,g.away,'sf',2,g.tie,false]));
+    }else if(step.stage==='final'){
+     const prev=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND stage='sf' AND winner IS NOT NULL",[comp.id])).rows;
+     const w=prev.filter(m=>m.leg===2).sort((a,b)=>a.tie-b.tie).map(m=>m.winner);
+     if(w.length===2)await insertMatches(c,[[comp.id,r1,w[0],w[1],'final',1,0,true]]);
     }
    }
   }
