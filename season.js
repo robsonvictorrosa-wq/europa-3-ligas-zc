@@ -136,6 +136,33 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
   return (await q('SELECT fixtures FROM rooms WHERE id=$1',[room.id]))[0].fixtures||fx;
  }
 
+
+ app.get('/api/rooms/:code/zc/calendar',auth,wrap(async(r,s)=>{
+  const room=await member(r);
+  const Cal=require('./calendar');
+  const mans=await q('SELECT m.user_id,m.club_id,u.nick FROM room_managers m JOIN users u ON u.id=m.user_id WHERE room_id=$1',[room.id]);
+  const me=mans.find(m=>m.user_id===r.user.id);
+  const admin=room.owner_id===r.user.id||!!r.user.admin;
+  let clubId=+r.query.club_id||me?.club_id||0;
+  const meta=id=>{const c=club(id);const row=E.CF.clubs.find(x=>x.name===c?.name||x.db===c?.name)||{};const lr=uni.prepare('SELECT league_key FROM lib_clubs WHERE club_id=?').get(id);
+   return {id,name:c?.name||'?',abbr:row.abbr||null,league_key:lr?.league_key||row.league||null};};
+  const clubs=E.CLUBS.map(meta);
+  if(!clubId)return s.json({needs_club:true,admin,clubs,games:[],windows:[],start_set:!!AGZ.AG.matches_start,current_matchday:room.current_matchday||0,status:room.status});
+  if(!E.CLUBS.includes(clubId))throw fail('Clube inválido',404);
+  if(!admin&&me?.club_id&&clubId!==me.club_id)throw fail('Só o admin vê o calendário de outro clube',403);
+  const fx=room.fixtures||(room.status==='lobby'?await fixturesPreview(room):{});
+  let matches=[];
+  if(room.status==='season'||room.status==='finished'){
+   matches=await q(`SELECT m.id,m.round,m.home,m.away,m.hg,m.ag,m.played,m.stage,m.leg,m.tie,m.winner,m.pens,c.kind AS comp_kind,c.name AS comp,c.league_key
+    FROM matches m JOIN competitions c ON c.id=m.comp_id WHERE c.room_id=$1 AND c.season=$2 AND (m.home=$3 OR m.away=$3) ORDER BY m.round,m.leg,m.id`,[room.id,room.season,clubId]);
+   matches=matches.map(m=>({...m,comp_key:m.comp_kind==='cup'?'cup-'+m.league_key:(m.comp_kind==='league'?m.league_key:m.comp_kind)}));
+  }
+  const built=Cal.buildClubCalendar({clubId,fixtures:fx,matches,slotAt:k=>AGZ.slotAt(k),agenda:AGZ.AG});
+  const by=Object.fromEntries(clubs.map(c=>[c.id,c]));
+  const games=built.games.map(g=>({...g,home_name:by[g.home]?.name,away_name:by[g.away]?.name,home_abbr:by[g.home]?.abbr,away_abbr:by[g.away]?.abbr,opp:g.venue==='H'?g.away:g.home,opp_name:g.venue==='H'?by[g.away]?.name:by[g.home]?.name,opp_abbr:g.venue==='H'?by[g.away]?.abbr:by[g.home]?.abbr}));
+  s.json({club:meta(clubId),admin,needs_club:false,clubs,games,windows:built.windows,start_set:!!AGZ.AG.matches_start,current_matchday:room.current_matchday||0,status:room.status,season:room.season});
+ }));
+
  app.get('/api/rooms/:code/zc/fixtures',auth,wrap(async(r,s)=>{
   const room=await member(r);
   const fx=room.status==='lobby'?await fixturesPreview(room):(room.fixtures||{});
@@ -178,16 +205,20 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
   const view=r.query.view;const t1=19,lr=comp.kind==='league'?38:(comp.kind==='ucl'||comp.kind==='el'?8:0);
   const opts={};if(view==='home')opts.side='home';if(view==='away')opts.side='away';if(view==='turno1'){opts.roundFrom=1;opts.roundTo=t1;}if(view==='turno2'){opts.roundFrom=t1+1;opts.roundTo=lr;}
   if(comp.kind==='league')opts.zones=true,opts.zoneFn=E.leagueZone;
+  if(comp.kind==='ucl'||comp.kind==='el')opts.zones=true,opts.zoneFn=pos=>pos<=8?'r16':pos<=24?'playoff':null;
   const ids=comp.league_key?clubsByLeague()[comp.league_key]:(await q("SELECT DISTINCT home id FROM matches WHERE comp_id=$1 AND stage='league' UNION SELECT DISTINCT away FROM matches WHERE comp_id=$1 AND stage='league'",[comp.id])).map(x=>x.id);
   const ms=await q("SELECT * FROM matches WHERE comp_id=$1 AND stage='league'",[comp.id]);
   const rows=E.standings(ms,ids,id=>club(id).name,await penMap(pool,room.id),opts);
   s.json({comp,rows,view:['home','away','turno1','turno2'].includes(view)?view:'geral',meta:{league_rounds:lr,turno1_end:t1,turno1:`1–${t1}`,turno2:`${t1+1}–${lr}`}});}));
 
  app.get('/api/rooms/:code/comp/:id/fixtures',auth,wrap(async(r,s)=>{const room=await member(r);const [comp]=await q('SELECT * FROM competitions WHERE id=$1 AND room_id=$2',[r.params.id,room.id]);if(!comp)throw fail('Competição não encontrada',404);
+  const hum=new Map((await q('SELECT m.club_id,u.nick FROM room_managers m JOIN users u ON u.id=m.user_id WHERE room_id=$1',[room.id])).map(x=>[x.club_id,x.nick]));
+  const wrapM=m=>({...m,home_name:club(m.home).name,away_name:club(m.away).name,home_mgr:hum.get(m.home)||null,away_mgr:hum.get(m.away)||null,at:null});
+  if(r.query.all){const ms=await q('SELECT id,round,home,away,hg,ag,played,stage,leg,tie,winner,pens,neutral FROM matches WHERE comp_id=$1 ORDER BY round,tie NULLS LAST,leg,id',[comp.id]);
+   return s.json({comp,plan:C.PLAN,stages:E.STAGE_NAMES,matches:ms.map(wrapM)});}
   const round=+r.query.round||Math.max(1,comp.current_round||1);
   const ms=await q('SELECT id,round,home,away,hg,ag,played,stage,leg,tie,winner,pens,neutral FROM matches WHERE comp_id=$1 AND round=$2 ORDER BY tie NULLS LAST,id',[comp.id,round]);
-  const hum=new Map((await q('SELECT m.club_id,u.nick FROM room_managers m JOIN users u ON u.id=m.user_id WHERE room_id=$1',[room.id])).map(x=>[x.club_id,x.nick]));
-  s.json({comp,round,plan:C.PLAN,stages:E.STAGE_NAMES,matches:ms.map(m=>({...m,home_name:club(m.home).name,away_name:club(m.away).name,home_mgr:hum.get(m.home)||null,away_mgr:hum.get(m.away)||null}))});}));
+  s.json({comp,round,plan:C.PLAN,stages:E.STAGE_NAMES,matches:ms.map(wrapM)});}));
 
  app.get('/api/rooms/:code/comp/:id/scorers',auth,wrap(async(r,s)=>{const room=await member(r);const [comp]=await q('SELECT id FROM competitions WHERE id=$1 AND room_id=$2',[r.params.id,room.id]);if(!comp)throw fail('Competição não encontrada',404);
   const name=id=>vname(id)||uni.prepare('SELECT name,primary_position FROM players WHERE id=?').get(id)||{};

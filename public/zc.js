@@ -2,7 +2,7 @@
 (function(){
 // Entrada no app (abrir site, PWA, recarregar, login): sempre o menu de quadros. hashchange depois disso segue normal.
 {const h=location.hash;if(h!=='#/'&&h!=='#'&&h!==''&&h!=='#/inicio')history.replaceState(null,'',location.pathname+location.search+'#/');}
-const TABS=[['','🏠','Menu'],['campeonato','🏆','Campeonato'],['mercado','🛒','Mercado'],['escalacao','📋','Escalação'],['jogos','⚽','Jogos'],['tabela','📑','Tabela'],['estatisticas','📊','Estatísticas'],['leilao','🔨','Leilão'],['premiacoes','🥇','Premiações'],['clubes','💰','Clubes e verbas'],['evolucao','📈','Evolução'],['central','⚙️','Central da liga',1]];
+const TABS=[['','🏠','Menu'],['campeonato','🏆','Campeonato'],['mercado','🛒','Mercado'],['escalacao','📋','Escalação'],['jogos','⚽','Jogos'],['calendario','📅','Calendário'],['tabela','📑','Tabela'],['estatisticas','📊','Estatísticas'],['leilao','🔨','Leilão'],['premiacoes','🥇','Premiações'],['clubes','💰','Clubes e verbas'],['evolucao','📈','Evolução'],['central','⚙️','Central da liga',1]];
 let OV=null;const R=()=>`/rooms/${ROOM}`;
 const POSC={GOL:'#C62828',GK:'#C62828',ZAG:'#E65100',CB:'#E65100',LD:'#E65100',LE:'#E65100',RB:'#E65100',LB:'#E65100',ADE:'#E65100',ADD:'#E65100',VOL:'#2E9E4F',CDM:'#2E9E4F',MC:'#2E9E4F',CM:'#2E9E4F',MEI:'#2E9E4F',CAM:'#2E9E4F',ME:'#2E9E4F',MD:'#2E9E4F',LM:'#2E9E4F',RM:'#2E9E4F',PE:'#FFFFFF',PD:'#FFFFFF',LW:'#FFFFFF',RW:'#FFFFFF',ATA:'#FFFFFF',ST:'#FFFFFF',SA:'#FFFFFF',CF:'#FFFFFF',CA:'#FFFFFF'};
 const pc=p=>POSC[p]||'#6B6B6B';
@@ -44,6 +44,7 @@ async function inicio(){if(!await need(''))return;
   <a class="tile t-merc" href="#/mercado"><h2>Mercado</h2><p>Propostas, observações e contratações.</p></a>
   <a class="tile t-esc" href="#/escalacao"><h2>Escalação</h2><p>Titulares, banco e tática.</p></a>
   <a class="tile t-jog" href="#/jogos"><h2>Jogos</h2><p>Rodadas e confrontos.</p></a>
+  <a class="tile t-cal" href="#/calendario"><h2>Calendário</h2><p>Jogos do seu time no mês.</p></a>
   <a class="tile t-tab" href="#/tabela"><h2>Tabela</h2><p>Classificação e forma recente.</p></a>
   <a class="tile t-est" href="#/estatisticas"><h2>Estatísticas</h2><p>Gols, notas e artilharia.</p></a>
   <a class="tile t-lei" href="#/leilao"><h2>Leilão</h2><p>Lotes e lances.</p></a>
@@ -71,29 +72,61 @@ async function campeonato(step){if(!await need('campeonato'))return;const c=OV.c
 let FX=null,FXt=0;async function zfx(){if(!FX||Date.now()-FXt>60e3){FX=await get(R()+'/zc/fixtures');FXt=Date.now()}return FX}
 const brt=iso=>new Date(iso).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
 const STG={league:'Rodada',prelim:'Preliminar',playoff:'Repescagem',playin:'Playoffs',r16:'Oitavas',qf:'Quartas',sf:'Semifinal',final:'Final'};
-async function jogos(sel){if(!await need('jogos'))return;let d;try{d=await zfx()}catch(e){app.innerHTML=empty('Erro ao carregar os jogos',esc(e.message));return}
- const mc=myClub(),my=mc&&mc.id,rs=d.rounds||[];const lr=rs.filter(x=>x.stage==='league').length;
- let r=+sel;if(!r){const nx=rs.find(x=>x.games.length&&x.games.some(g=>!g.played));r=nx?nx.round:1}
- const cur=rs[r-1]||{games:[]};const lab=x=>x.stage==='league'?`Rodada ${x.round}`:(STG[x.stage]||x.stage)+(x.label?' · '+x.label:'');
- let h=`<h2>⚽ Jogos</h2><select onchange="location.hash='#/jogos/'+this.value" style="width:100%;margin-bottom:10px">${rs.map(x=>`<option value="${x.round}" ${x.round===r?'selected':''}>${lab(x)} – ${brt(x.at)}</option>`+(x.win?`<option disabled>── 🔨 Janela: leilão + mercado (${new Date(x.win.auction_start).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}).slice(0,5)}–${new Date(x.win.market_close).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}).slice(0,5)}) ──</option>`:'')).join('')}</select>`;
- h+=`<p class="sub" style="font-size:13px">${lab(cur)} · ${brt(cur.at)} (horário de Brasília)${cur.stage==='league'?` · ${lr} rodadas na fase de liga`:''}</p>`;
- const gs=[...cur.games].sort((a,b)=>(b.home===my||b.away===my)-(a.home===my||a.away===my));
- h+=gs.length?`<div class="zg">${gs.map(m=>{const me=my&&(m.home===my||m.away===my);return `<div class="mc" ${m.id?`onclick="location.hash='#/jogo/${m.id}'" style="cursor:pointer;${me?'outline:2px solid #E5E7EB':''}"`:me?'style="outline:2px solid #E5E7EB"':''}><div class="tm">${badge(m.home_name)}<span class="nm">${esc(m.home_name)}</span></div><div class="sc">${m.played?`${m.hg} × ${m.ag}`:'×'}<span class="st">${m.played?'Encerrado'+(m.pens?' (pên.)':''):'Agendado'}</span></div><div class="tm r"><span class="nm">${esc(m.away_name)}</span>${badge(m.away_name)}</div></div>`}).join('')}</div>`:empty('Confrontos a definir','Esta fase depende da classificação.');
- const W=rs.map(x=>x.win&&{...x.win,round:x.round}).filter(Boolean),ft=x=>new Date(x).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
- h+=W.length?`<h3 style="margin-top:18px">🗓️ Pausas do calendário</h3>`+W.map(w=>`<div class="card warn" style="margin:8px 0"><b>🔨 Janela após a ${w.stage==='end'?'fase de liga (rodada '+w.round+')':'rodada '+w.round}: leilão + mercado</b><div class="sub" style="font-size:13px">Leilão ${ft(w.auction_start)} → ${ft(w.auction_close)} · Mercado até ${ft(w.market_close)} · sem jogos nesse período</div></div>`).join(''):'';
+
+const COMPS_UI=[{key:'pl',kind:'league',league_key:'pl',name:'Premier League',mode:'table'},{key:'ll',kind:'league',league_key:'ll',name:'La Liga',mode:'table'},{key:'sa',kind:'league',league_key:'sa',name:'Serie A',mode:'table'},{key:'ucl',kind:'ucl',name:'Champions League',mode:'table+bracket'},{key:'el',kind:'el',name:'Europa League',mode:'table+bracket'},{key:'cup-pl',kind:'cup',league_key:'pl',name:'FA Cup',mode:'bracket'},{key:'cup-ll',kind:'cup',league_key:'ll',name:'Copa del Rey',mode:'bracket'},{key:'cup-sa',kind:'cup',league_key:'sa',name:'Coppa Italia',mode:'bracket'}];
+function compsList(){const real=OV?.comps||[];return COMPS_UI.map(d=>{const r=real.find(c=>c.kind===d.kind&&(d.kind==='ucl'||d.kind==='el'||c.league_key===(d.league_key||d.key)));return {...d,id:r?.id||null,champion:r?.champion||null};});}
+function curComp(){const L=compsList();let i=L.findIndex(x=>x.key===(sessionStorage.zSel||''));if(i<0){const lk=myClub()?.league_key;i=Math.max(0,L.findIndex(x=>x.kind==='league'&&x.league_key===lk));}sessionStorage.zSel=L[i].key;return L[i];}
+window.zSel=(d,page)=>{const L=compsList();let i=L.findIndex(x=>x.key===(sessionStorage.zSel||''));if(i<0)i=0;sessionStorage.zSel=L[(i+d+L.length)%L.length].key;if(page==='tabela')tabela();else if(page==='jogos')jogos();else estatisticas();};
+function compBar(page){const c=curComp();return `<div class="csel"><button type="button" class="csel-btn" onclick="zSel(-1,'${page}')" aria-label="Campeonato anterior">◀</button><div class="csel-name">${esc(c.name)}</div><button type="button" class="csel-btn" onclick="zSel(1,'${page}')" aria-label="Próximo campeonato">▶</button></div>`;}
+function drawBracket(d){if(!d||!d.stages||!d.stages.length)return `<div class="card empty">O chaveamento desta fase ainda não foi definido. Ele aparece quando a fase anterior termina.</div>`;
+ const order=['prelim','playoff','r16','qf','sf','final'];const stages=[...d.stages].sort((a,b)=>order.indexOf(a.key)-order.indexOf(b.key));
+ const agg=legs=>{const played=legs.filter(l=>l.played);if(!played.length)return '';const a=legs[0].home;let ga=0,gb=0;for(const l of played){if(l.home===a){ga+=l.hg;gb+=l.ag}else{ga+=l.ag;gb+=l.hg}}return `<div class="bk-agg">Agregado: <b>${esc(legs[0].home_name)} ${ga}–${gb} ${esc(legs[0].away_name)}</b>${played.length<legs.length?' <span class="sub">(parcial)</span>':''}</div>`;};
+ const champ=d.champion?`<div class="card" style="text-align:center;font-size:1.15em">🏆 Campeão: <b>${esc(d.champion)}</b></div>`:'';
+ return champ+stages.map(s=>`<h3 class="bk-st">${esc(s.name)}</h3><div class="bk-grid">${s.ties.map(t=>`<div class="card bk-tie">${t.legs.map(l=>`<div class="bk-leg"${l.id?` onclick="location.hash='#/jogo/${l.id}'" style="cursor:pointer"`:''}><span class="bk-side">${badge(l.home_name)} <span class="nm">${esc(l.home_name)}</span></span><b class="bk-sc">${l.played?`${l.hg} × ${l.ag}`:'×'}</b><span class="bk-side r"><span class="nm">${esc(l.away_name)}</span> ${badge(l.away_name)}</span><span class="sub bk-lab">${l.leg===2?'volta':l.leg===1?'ida':''}${l.pens?' · pên. '+l.pens:''}</span></div>`).join('')}${agg(t.legs)}${t.winner_name?`<div class="bk-win">➡️ ${esc(t.winner_name)}</div>`:''}</div>`).join('')}</div>`).join('');
+}
+
+async function jogos(sel){if(!await need('jogos'))return;const cp=curComp(),mc=myClub(),my=mc&&mc.id;
+ let h=`<h2>⚽ Jogos</h2>${compBar('jogos')}`;
+ if(cp.mode==='bracket'){if(!cp.id){app.innerHTML=h+empty('Temporada não iniciada','O chaveamento da copa aparece quando a temporada começa.');return;}let d;try{d=await get(`${R()}/comp/${cp.id}/bracket`)}catch(e){app.innerHTML=h+empty('Erro ao carregar o chaveamento',esc(e.message));return;}app.innerHTML=h+drawBracket(d);return;}
+ const render=gs=>{const list=[...gs].sort((a,b)=>(b.home===my||b.away===my)-(a.home===my||a.away===my));return list.length?`<div class="zg">${list.map(m=>{const me=my&&(m.home===my||m.away===my);return `<div class="mc" ${m.id?`onclick="location.hash='#/jogo/${m.id}'" style="cursor:pointer;${me?'outline:2px solid #E5E7EB':''}"`:me?'style="outline:2px solid #E5E7EB"':''}><div class="tm">${badge(m.home_name)}<span class="nm">${esc(m.home_name)}</span></div><div class="sc">${m.played?`${m.hg} × ${m.ag}`:'×'}<span class="st">${m.played?'Encerrado'+(m.pens?' (pên.)':''):'Agendado'}</span></div><div class="tm r"><span class="nm">${esc(m.away_name)}</span>${badge(m.away_name)}</div></div>`}).join('')}</div>`:empty('Confrontos a definir','Esta fase depende da classificação.');};
+ if(!cp.id){let d;try{d=await zfx()}catch(e){app.innerHTML=h+empty('Erro ao carregar os jogos',esc(e.message));return;}
+  const rs=(d.rounds||[]).map(x=>({...x,games:(x.games||[]).filter(g=>!g.league_key||g.league_key===cp.league_key||(cp.kind==='ucl'&&g.comp_kind==='ucl')||(cp.kind==='el'&&g.comp_kind==='el'))}));
+  let r=+sel;if(!r){const nx=rs.find(x=>x.games.length&&x.games.some(g=>!g.played));r=nx?nx.round:1}
+  const cur=rs[r-1]||{games:[]};const lab=x=>(x.label||((x.stage==='league'?`Rodada ${x.round}`:(STG[x.stage]||x.stage))));
+  h+=`<select onchange="location.hash='#/jogos/'+this.value" style="width:100%;margin-bottom:10px">${rs.map(x=>`<option value="${x.round}" ${x.round===r?'selected':''}>${lab(x)} – ${x.at?brt(x.at):''}</option>`).join('')}</select>`;
+  h+=`<p class="sub" style="font-size:13px">${lab(cur)}${cur.at?' · '+brt(cur.at)+' (horário de Brasília)':''}</p>`+render(cur.games||[]);
+  app.innerHTML=h;return;}
+ let d;try{d=await get(`${R()}/comp/${cp.id}/fixtures?all=1`)}catch(e){app.innerHTML=h+empty('Erro ao carregar os jogos',esc(e.message));return;}
+ const ms=d.matches||[],lp=ms.filter(m=>(m.stage||'league')==='league'),ko=ms.filter(m=>(m.stage||'league')!=='league');
+ const rounds=[...new Set(lp.map(m=>m.round))].sort((a,b)=>a-b);
+ let r=+sel;if(!r){const nx=lp.find(g=>!g.played);r=nx?nx.round:(rounds[0]||1);}
+ const cur=lp.filter(m=>m.round===r);
+ if(rounds.length)h+=`<select onchange="location.hash='#/jogos/'+this.value" style="width:100%;margin-bottom:10px">${rounds.map(n=>`<option value="${n}" ${n===r?'selected':''}>Rodada ${n} · fase de liga</option>`).join('')}</select><p class="sub" style="font-size:13px">Rodada ${r} da fase de liga</p>`+render(cur);
+ else if(!ko.length)h+=empty('Confrontos a definir','Os jogos aparecem quando a temporada começa.');
+ if(cp.mode==='table+bracket'||ko.length){let br;try{br=await get(`${R()}/comp/${cp.id}/bracket`)}catch(e){}if(br)h+=`<h2 style="margin-top:22px">Chaveamento</h2>`+drawBracket(br);}
  app.innerHTML=h}
 let TBc={},TBt=0,TBview='geral';
+
 const TB_VIEWS=[['geral','Geral'],['home','Em casa'],['away','Fora'],['turno1','1º turno'],['turno2','2º turno']];
-async function tabela(view){if(!await need('tabela'))return;const comps=OV.comps||[];const leagues=comps.filter(x=>x.kind==='league');const c=(leagues[+(sessionStorage.zComp||0)]||leagues[0]||OV.comp),mc=myClub();
+async function tabela(view){if(!await need('tabela'))return;const cp=curComp(),mc=myClub();
+ let h=`<h2>📑 Tabela</h2>${compBar('tabela')}`;
+ if(cp.mode==='bracket'){if(!cp.id){app.innerHTML=h+empty('Temporada não iniciada','O chaveamento da copa aparece quando a temporada começa.');return;}let d;try{d=await get(`${R()}/comp/${cp.id}/bracket`)}catch(e){app.innerHTML=h+empty('Erro',esc(e.message));return;}app.innerHTML=h+drawBracket(d);return;}
  const v=TB_VIEWS.some(x=>x[0]===view)?view:'geral';TBview=v;
  const F0=FMT();let rows=null,meta={league_rounds:F0.league_rounds,turno1_end:F0.turno1_end,turno1:`1–${F0.turno1_end}`,turno2:`${F0.turno1_end+1}–${F0.league_rounds}`};
- try{if(c){const hit=TBc[v],stale=!hit||Date.now()-(hit._t||0)>60e3;if(stale){const d=await get(`${R()}/comp/${c.id}/table?view=${encodeURIComponent(v)}`);TBc[v]={...d,_t:Date.now()};if(d.meta)meta=d.meta}else if(hit.meta)meta=hit.meta;rows=TBc[v].rows}}catch(e){}
- if(!rows)rows=[...OV.clubs].sort((a,b)=>a.name.localeCompare(b.name)).map((x,i)=>({club_id:x.id,name:x.name,manager:x.manager,pts:0,j:0,v:0,e:0,d:0,gp:0,gc:0,form:[],zone:v==='geral'?(i<F0.direct?'oitavas':i<F0.playin_to?'playin':''):null}));
+ const ck=(cp.id||cp.key)+':'+v;
+ try{if(cp.id){const hit=TBc[ck],stale=!hit||Date.now()-(hit._t||0)>60e3;if(stale){const d=await get(`${R()}/comp/${cp.id}/table?view=${encodeURIComponent(v)}`);TBc[ck]={...d,_t:Date.now()};if(d.meta)meta=d.meta}else if(hit.meta)meta=hit.meta;rows=TBc[ck].rows}}catch(e){}
+ if(!rows){const pool=(OV.clubs||[]).filter(x=>!cp.league_key||x.league_key===cp.league_key);rows=pool.sort((a,b)=>a.name.localeCompare(b.name)).map((x,i)=>({club_id:x.id,name:x.name,manager:x.manager,pts:0,j:0,v:0,e:0,d:0,gp:0,gc:0,form:[],zone:null}));}
  const showZones=v==='geral';
+ const zc=z=>z==='ucl'||z==='r16'||z==='oitavas'?'zone-o':z==='el'||z==='playoff'||z==='playin'?'zone-p':'';
  const fm=f=>(f||[]).map(x=>{const k=String(x).toUpperCase()[0];return `<span style="display:inline-block;width:14px;height:14px;border-radius:3px;font-size:10px;line-height:14px;text-align:center;color:#fff;background:${k==='V'||k==='W'?'#2E9E4F':k==='E'?'#6B6B6B':'#C62828'}">${k==='W'?'V':k}</span>`}).join(' ');
- const filt=`<div class="chips" style="margin:8px 0 12px">${TB_VIEWS.map(([k,lab])=>`<a class="chip ${v===k?'on':''}" href="#/tabela/${k}">${lab}</a>`).join('')}</div>`;
+ const hideTurno=cp.kind==='ucl'||cp.kind==='el';
+ const views=hideTurno?TB_VIEWS.filter(x=>x[0]!=='turno1'&&x[0]!=='turno2'):TB_VIEWS;
+ const filt=`<div class="chips" style="margin:8px 0 12px">${views.map(([k,lab])=>`<a class="chip ${v===k?'on':''}" href="#/tabela/${k}">${lab}</a>`).join('')}</div>`;
  const hint=v==='turno1'?`1º turno · rodadas ${meta.turno1}`:v==='turno2'?`2º turno · rodadas ${meta.turno2}`:v==='home'?'Só jogos em casa':v==='away'?'Só jogos fora':'Classificação geral';
- let h=`<h2>📑 Tabela</h2>${filt}<p class="sub" style="font-size:13px;margin-top:-4px">${hint}${c?'':'. A temporada ainda não começou: todos com 0 pontos.'}</p><div class="tw"><table><tr><th>#</th><th>Clube</th><th>Técnico</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Últ. 5</th></tr>${rows.map((x,i)=>`<tr class="${showZones&&x.zone==='oitavas'?'zone-o':showZones&&x.zone==='playin'?'zone-p':''}" ${mc&&x.club_id===mc.id?'style="outline:2px solid #E5E7EB"':''}><td>${i+1}</td><td style="display:flex;align-items:center;gap:6px">${badge(x.name)} ${esc(x.name)}</td><td>${x.manager?esc(x.manager):'—'}</td><td><b>${x.pts}</b>${x.penalty?`<div class="no" style="font-size:11px">-${x.penalty}</div>`:''}</td><td>${x.j}</td><td>${x.v}</td><td>${x.e}</td><td>${x.d}</td><td>${x.gp}</td><td>${x.gc}</td><td>${x.gp-x.gc}</td><td style="white-space:nowrap">${fm(x.form)}</td></tr>`).join('')}</table></div><p class="sub" style="font-size:12px">${showZones?'<span style="color:#E5E7EB">■</span> 1º–8º vão direto às oitavas · <span style="color:#C5C5C5">■</span> 9º–24º jogam os playoffs (9×24, 10×23…) em ida e volta · ':''}<a href="#/matamata">Ver mata-mata</a></p>`;
+ const legend=cp.kind==='league'?`<span style="color:#E5E7EB">■</span> 1º–10º Champions League · <span style="color:#9CA3AF">■</span> 11º–20º Europa League`
+  :(cp.kind==='ucl'||cp.kind==='el'?`<span style="color:#E5E7EB">■</span> 1º–8º direto às oitavas · <span style="color:#9CA3AF">■</span> 9º–24º jogam a repescagem (9×24, 10×23…) em ida e volta`:'');
+ h+=`${filt}<p class="sub" style="font-size:13px;margin-top:-4px">${hint}${cp.id?'':'. A temporada ainda não começou: todos com 0 pontos.'}</p><div class="tw"><table><tr><th>#</th><th>Clube</th><th>Técnico</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Últ. 5</th></tr>${rows.map((x,i)=>`<tr class="${showZones?zc(x.zone):''}" ${mc&&x.club_id===mc.id?'style="outline:2px solid #E5E7EB"':''}><td>${i+1}</td><td style="display:flex;align-items:center;gap:6px">${badge(x.name)} ${esc(x.name)}</td><td>${x.manager?esc(x.manager):'—'}</td><td><b>${x.pts}</b>${x.penalty?`<div class="no" style="font-size:11px">-${x.penalty}</div>`:''}</td><td>${x.j}</td><td>${x.v}</td><td>${x.e}</td><td>${x.d}</td><td>${x.gp}</td><td>${x.gc}</td><td>${x.gp-x.gc}</td><td style="white-space:nowrap">${fm(x.form)}</td></tr>`).join('')}</table></div><p class="sub" style="font-size:12px">${showZones&&legend?legend+' · ':''}</p>`;
+ if(cp.mode==='table+bracket'&&cp.id){let br;try{br=await get(`${R()}/comp/${cp.id}/bracket`)}catch(e){}if(br)h+=`<h2 style="margin-top:22px">Chaveamento</h2>`+drawBracket(br);}
  app.innerHTML=h}
 window.zSim=async(force)=>{const bad=OV.clubs.filter(c=>c.manager&&!c.meta.ok);
  if(bad.length&&!force){document.getElementById('zwarn').innerHTML=`<div class="card warn" style="margin-bottom:12px"><div class="kick">⚠ Meta do onze</div><p>Clubes humanos abaixo da meta (${OV.meta_need} contratados no XI):</p>${bad.map(c=>`<div class="mgr" style="padding:4px 0">${esc(c.name)} · ${esc(c.manager)} <b class="no">${c.meta.n}/${c.meta.need}</b></div>`).join('')}<button class="btn" style="margin-top:10px" onclick="zSim(1)">Simular mesmo assim</button></div>`;return}
@@ -280,10 +313,10 @@ window.zLf=t=>{t=t.toLowerCase();const L=(window._LL||[]).filter(p=>!t||(p.name+
 
 // ---------- ESTATÍSTICAS ----------
 let EST={stage:'',club:''};
-async function estatisticas(){if(!await need('estatisticas'))return;if(!OV.comp){app.innerHTML=empty('Temporada não iniciada');return}
- const s=await get(`${R()}/zc/stats?stage=${EST.stage}&club=${EST.club}`);
+async function estatisticas(){if(!await need('estatisticas'))return;const cp=curComp();if(!cp.id){app.innerHTML=`<div class="hero"><div class="kick">Estatísticas</div><h1>Estatísticas</h1></div>${compBar('estatisticas')}`+empty('Temporada não iniciada');return}
+ const s=await get(`${R()}/zc/stats?stage=${EST.stage}&club=${EST.club}&comp=${cp.id}`);
  const tb=(t,L,k,lab)=>`<h2>${t}</h2>${L.length?`<div class="card" style="padding:0">${L.map((p,i)=>`<div class="pl"><b style="width:20px">${i+1}</b>${psq(p)}<div class="i"><b>${esc(p.name)}</b><span>${esc(p.club)} · ${p.apps} jogos</span></div><b style="font-size:18px">${p[k]}</b><span class="sub" style="margin:0;font-size:11px">${k==='rating'&&window.mediaRot?mediaRot(p[k]):lab}</span></div>`).join('')}</div>`:empty('Sem dados')}`;
- app.innerHTML=`<div class="hero"><div class="kick">Estatísticas</div><h1>${s.matches} jogos disputados</h1><div style="display:flex;gap:6px;flex-wrap:wrap"><select onchange="EST_(this.value,null)"><option value="">Todas as fases</option><option value="league" ${EST.stage==='league'?'selected':''}>Fase de liga</option><option value="ko" ${EST.stage==='ko'?'selected':''}>Mata-mata</option></select><select onchange="EST_(null,this.value)"><option value="">Todos os clubes</option>${(s.clubs||OV.clubs).map(c=>`<option value="${c.id}" ${+EST.club===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div></div>
+ app.innerHTML=`<div class="hero"><div class="kick">Estatísticas</div><h1>${s.matches} jogos disputados</h1>${compBar('estatisticas')}<div style="display:flex;gap:6px;flex-wrap:wrap"><select onchange="EST_(this.value,null)"><option value="">Todas as fases</option><option value="league" ${EST.stage==='league'?'selected':''}>Fase de liga</option><option value="ko" ${EST.stage==='ko'?'selected':''}>Mata-mata</option></select><select onchange="EST_(null,this.value)"><option value="">Todos os clubes</option>${(s.clubs||OV.clubs).map(c=>`<option value="${c.id}" ${+EST.club===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div></div>
  ${tb('Artilharia',s.goals||[],'goals','gols')}${tb('Assistências',s.assists||[],'assists','assist.')}${tb(`⭐ Maiores notas médias <span class="sub">(mín. ${s.min_apps||1} jogo${(s.min_apps||1)>1?'s':''})</span>`,s.ratings||[],'rating','nota')}`;}
 window.EST_=(st,c)=>{if(st!==null)EST.stage=st;if(c!==null)EST.club=c;estatisticas();};
 
@@ -391,6 +424,50 @@ window.zAdm=async()=>{const el=document.getElementById('adms');if(!el)return;try
 window.zRole=async(id,on)=>{try{await post('/zc/admin/role',{user_id:id,admin:!!on});zAdm();}catch(e){alert(e.message)}};
 window.zCon=async id=>{if(!confirm('Desfazer esta venda e devolver o valor?'))return;try{await post(R()+'/zc/admin/contest',{transfer_id:id});central();}catch(e){alert(e.message)}};
 
+
+async function zCalendario(ym){if(!await need('calendario'))return;
+ const qid=sessionStorage.zCalClub||'';
+ let d;try{d=await get(`${R()}/zc/calendar${qid?'?club_id='+qid:''}`)}catch(e){app.innerHTML=empty('Erro ao carregar o calendário',esc(e.message));return;}
+ if(d.needs_club&&!d.admin){app.innerHTML=noClub();return;}
+ const ymd=iso=>{try{return new Date(iso).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'})}catch(e){return ''}};
+ const pick=d.admin?`<label class="cal-pick"><span>Clube</span><select onchange="zCalClub(this.value)">${(d.clubs||[]).map(c=>`<option value="${c.id}" ${d.club&&c.id===d.club.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:'';
+ if(d.needs_club){app.innerHTML=`<h2>📅 Calendário</h2><div class="card"><p class="sub" style="margin-top:0">Escolha um clube para ver os jogos da temporada.</p>${pick}</div>`;return;}
+ const byDay={};for(const g of d.games||[]){if(!g.at)continue;const k=ymd(g.at);(byDay[k]??=[]).push(g);}
+ const winDay={};
+ const span=(a,b,w)=>{if(!a||!b)return;let t=new Date(a+'T12:00:00-03:00'),end=new Date(b+'T12:00:00-03:00');for(;t<=end;t=new Date(t.getTime()+864e5)){const k=t.toISOString().slice(0,10);(winDay[k]??=[]).push(w);}};
+ for(const w of d.windows||[])span(ymd(w.auction_start||w.market_open),ymd(w.market_close),w);
+ const months=Object.keys(byDay).sort();
+ let start=ym||'';
+ if(!/^\d{4}-\d{2}$/.test(start)){
+  const nxt=(d.games||[]).find(g=>g.at&&!g.played)||(d.games||[]).find(g=>g.at);
+  start=nxt?ymd(nxt.at).slice(0,7):(months[0]||new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}).slice(0,7));
+ }
+ const [Y,M]=start.split('-').map(Number);
+ const shift=(y,m,d)=>{const dt=new Date(Date.UTC(y,m-1+d,1));return dt.getUTCFullYear()+'-'+String(dt.getUTCMonth()+1).padStart(2,'0');};
+ const prev=shift(Y,M,-1),next=shift(Y,M,1);
+ const title=new Date(Date.UTC(Y,M-1,1)).toLocaleDateString('pt-BR',{month:'long',year:'numeric',timeZone:'UTC'});
+ const first=new Date(Date.UTC(Y,M-1,1));const firstWd=new Date(Y+'-'+String(M).padStart(2,'0')+'-01T12:00:00-03:00').getUTCDay();
+ const dim=new Date(Date.UTC(Y,M,0)).getUTCDate();
+ const cells=[];for(let i=0;i<firstWd;i++)cells.push({out:1,d:0,k:''});
+ for(let d0=1;d0<=dim;d0++){const k=`${Y}-${String(M).padStart(2,'0')}-${String(d0).padStart(2,'0')}`;cells.push({out:0,d:d0,k,games:byDay[k]||[],win:winDay[k]||[]});}
+ while(cells.length%7)cells.push({out:1,d:0,k:''});
+ const tag=k=>({league:'LIGA',pl:'LIGA',ll:'LIGA',sa:'LIGA',ucl:'UCL',el:'EL',cup:'COPA','cup-pl':'COPA','cup-ll':'COPA','cup-sa':'COPA'}[k]||(k||'').toUpperCase().slice(0,4));
+ const cell=c=>{if(c.out)return `<div class="cal-d out"></div>`;
+  const g=c.games[0],gs=c.games,w=c.win[0];
+  const cls=['cal-d',gs.length?'match':'',w?'win':'',gs.some(x=>x.played)?'played':''].filter(Boolean).join(' ');
+  if(!gs.length&&!w)return `<div class="${cls}"><span class="cal-n">${c.d}</span></div>`;
+  if(!gs.length){const lab=w.stage==='pre'?'PRÉ':(w.auction_start&&c.k>=ymd(w.auction_start)&&c.k<=ymd(w.auction_close)?'LEILÃO':'MERCADO');return `<div class="${cls}"><span class="cal-n">${c.d}</span><span class="cal-w">${lab}</span></div>`;}
+  return `<div class="${cls} ck-${gs[0].comp_kind||'league'}" ${gs[0].id?`onclick="location.hash='#/jogo/${gs[0].id}'"`:''}><span class="cal-n">${c.d}</span>${gs.map(x=>{const opp=x.opp_abbr||abbr(x.opp_name||'');const sc=x.played?(x.venue==='H'?`${x.hg}-${x.ag}`:`${x.ag}-${x.hg}`):'';return `<div class="cal-m"><span class="cal-ha">${x.venue==='H'?'Casa':'Fora'}</span><span class="cal-cp">${tag(x.comp_key||x.comp_kind)}</span><span class="cal-opp">${badge(x.opp_name||'?')}<b>${esc(opp)}</b></span>${sc?`<span class="cal-sc">${sc}</span>`:''}</div>`;}).join('')}</div>`;};
+ const nodate=!(d.start_set)&& (d.games||[]).some(g=>!g.at);
+ const list=nodate?`<div class="card warn"><b>O administrador ainda não definiu a data de início.</b><p class="sub" style="margin:4px 0 0">Os jogos já estão no calendário e ganham dia e hora quando a agenda for ligada.</p></div><div class="cal-list">${(d.games||[]).map(g=>`<div class="cal-li"><span class="sub">Jornada ${g.matchday||'—'}</span> <b>${g.venue==='H'?'Casa':'Fora'}</b> · ${esc(g.comp||'')} · ${esc(g.opp_name||'')}</div>`).join('')}</div>`:'';
+ app.innerHTML=`<div class="cal-wrap"><div class="cal-head"><h2>📅 Calendário</h2>${pick}</div>
+  <div class="cal-nav"><button type="button" class="csel-btn" onclick="location.hash='#/calendario/${prev}'" aria-label="Mês anterior">◀</button><div class="cal-mo">${esc(title)}</div><button type="button" class="csel-btn" onclick="location.hash='#/calendario/${next}'" aria-label="Próximo mês">▶</button></div>
+  ${d.club?`<p class="sub cal-club">${esc(d.club.name)} · Temporada ${d.season||''}</p>`:''}
+  ${nodate?list:`<div class="cal-grid"><div class="cal-wd">${['DOM','SEG','TER','QUA','QUI','SEX','SÁB'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cal-body">${cells.map(cell).join('')}</div></div>
+  <div class="cal-leg"><span class="ck-league">Liga</span><span class="ck-ucl">Champions</span><span class="ck-el">Europa League</span><span class="ck-cup">Copa</span><span class="cal-w">Leilão / mercado</span></div>`}</div>`;}
+window.zCalendario=zCalendario;
+window.zCalClub=id=>{sessionStorage.zCalClub=id;location.hash='#/calendario';if((location.hash.slice(1)||'')==='/calendario')zCalendario();};
+
 // ---------- roteador ----------
 window.mercado=sub=>sub==='propostas'?(location.hash==='#/negociacoes'?negociacoes():location.hash='#/negociacoes'):zMercado(sub);
 
@@ -407,7 +484,7 @@ window.zSaveShirts=async()=>{const numbers=[];document.querySelectorAll('input[i
 
 const old=window.route;
 window.route=function(){try{closeM()}catch(e){}scrollTo(0,0);const m=(location.hash.slice(1)||'/').split('/');const t=m[1]||'';
- const map={'':inicio,inicio,campeonato:()=>campeonato(m[2]),mercado:()=>zMercado(m[2]),negociacoes,contratacoes:()=>location.hash='#/mercado/contratacoes',escalacao:()=>(m[2]==='numeros'||m[2]==='camisa')?zNumeros():zEscalacao(),emprestimos:()=>location.hash='#/mercado',estatisticas,jogos:()=>jogos(m[2]),tabela:()=>tabela(m[2]),leilao,premiacoes,clubes,evolucao,central};
+ const map={'':inicio,inicio,campeonato:()=>campeonato(m[2]),mercado:()=>zMercado(m[2]),negociacoes,contratacoes:()=>location.hash='#/mercado/contratacoes',escalacao:()=>(m[2]==='numeros'||m[2]==='camisa')?zNumeros():zEscalacao(),emprestimos:()=>location.hash='#/mercado',estatisticas,jogos:()=>jogos(m[2]),calendario:()=>zCalendario(m[2]),tabela:()=>tabela(m[2]),leilao,premiacoes,clubes,evolucao,central};
  if(t==='ligas'){chrome('');return salas();}
  const OKOLD=['jogo','matamata','bolao','artilharia','como-funciona','clube'];
  if(!map[t]&&!OKOLD.includes(t))return location.hash='#/';
