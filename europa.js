@@ -35,20 +35,43 @@ function penalties(r=Math.random){let a=0,b=0;for(let i=0;i<5;i++){if(r()<.75)a+
 function winners(prev,stage){return prev.filter(m=>m.stage===stage&&m.winner).map(m=>({club:m.winner,tie:m.tie}));}
 function decideTie(ms,last,r=Math.random){const a=last.home,b=last.away;let ga=0,gb=0;for(const m of ms){if(m.home===a){ga+=m.hg;gb+=m.ag}else{ga+=m.ag;gb+=m.hg}}
  if(ga!==gb)return {winner:ga>gb?a:b,agg:[ga,gb],pens:null};const p=penalties(r);return {winner:p[0]>p[1]?a:b,agg:[ga,gb],pens:p.join('-')};}
-// Qualificação europeia. season=1 (ou seeds ausentes): 10 melhores de cada liga pelo over dos 11. Depois: top 10 da tabela da temporada anterior.
+// Qualificação europeia. season=1 (ou seeds ausentes): 10 melhores de cada liga pelo over dos 11.
+// Da 2ª em diante: top 10 da tabela, com vaga garantida na Champions para o campeão da Champions
+// e o campeão da copa nacional de cada país (uma vaga só se o mesmo time ganhar as duas).
+// Quem já está no top 10 não muda nada; quem está fora toma a vaga do 10º (e do 9º, se forem dois),
+// pulando quem já tiver vaga garantida. Quem perde a vaga vai à Europa League. Sempre 10+10 por liga.
 function qualifyEurope(opts={}){
- const {season=1,tables=null,uni=null}=opts; // tables: {pl:[{club_id,pos}],...}
+ const {season=1,tables=null,uni=null,champions=null}=opts; // tables: {pl:[{club_id,pos}],...}; champions: {ucl, cups:{pl,ll,sa}}
  const ucl=[],el=[];
+ const cups=champions?.cups||{};
+ const uclChamp=champions?.ucl||null;
  for(const lg of LEAGUES){
   let ordered;
   if(season>1&&tables&&tables[lg.key]&&tables[lg.key].length>=20){
    ordered=tables[lg.key].slice().sort((a,b)=>a.pos-b.pos).map(x=>x.club_id);
+   const g=[];
+   const cupW=cups[lg.key]||null;
+   if(cupW&&ordered.includes(cupW))g.push(cupW);
+   if(uclChamp&&uclChamp!==cupW&&ordered.includes(uclChamp))g.push(uclChamp);
+   const top=ordered.slice(0,10);
+   const guaranteed=new Set(g);
+   const outside=g.filter(id=>!top.includes(id));
+   const dropped=[];
+   if(outside.length){
+    for(let i=top.length-1;i>=0&&dropped.length<outside.length;i--){
+     if(!guaranteed.has(top[i]))dropped.push(top[i]);
+    }
+   }
+   const drop=new Set(dropped);
+   const kept=top.filter(id=>!drop.has(id));
+   ucl.push(...kept,...outside);
+   el.push(...ordered.filter(id=>!kept.includes(id)&&!outside.includes(id)));
   }else{
    const rows=(uni?uni.prepare('SELECT club_id,ovr11 FROM lib_clubs WHERE league_key=? ORDER BY ovr11 DESC, name').all(lg.key):clubsOf(lg.key).sort((a,b)=>b.ovr11-a.ovr11).map(c=>({club_id:c.id,ovr11:c.ovr11})));
    ordered=rows.map(r=>r.club_id??r.id);
+   ucl.push(...ordered.slice(0,10));
+   el.push(...ordered.slice(10,20));
   }
-  ucl.push(...ordered.slice(0,10));
-  el.push(...ordered.slice(10,20));
  }
  return {ucl,el};
 }

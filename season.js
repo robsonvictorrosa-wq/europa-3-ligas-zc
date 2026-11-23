@@ -42,11 +42,22 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
   return out;
  }
 
+ async function prevChampions(db,room,prevSeason){
+  const [ucl]=(await db.query("SELECT champion FROM competitions WHERE room_id=$1 AND season=$2 AND kind='ucl'",[room.id,prevSeason])).rows;
+  const cups={};
+  for(const lg of E.LEAGUES){
+   const [c]=(await db.query("SELECT champion FROM competitions WHERE room_id=$1 AND season=$2 AND kind='cup' AND league_key=$3",[room.id,prevSeason,lg.key])).rows;
+   cups[lg.key]=c?.champion||null;
+  }
+  return {ucl:ucl?.champion||null,cups};
+ }
+
  async function seedEurope(db,room){
   const tables=room.season>2026?await prevLeagueTables(db,room,room.season-1):null;
   // season default 2026 is first; also treat first snapshot season as 1st
   const first=!(tables);
-  const q=E.qualifyEurope({season:first?1:2,tables,uni});
+  const champs=first?null:await prevChampions(db,room,room.season-1);
+  const q=E.qualifyEurope({season:first?1:2,tables,uni,champions:champs});
   return q;
  }
 
@@ -69,7 +80,8 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
    const byL=clubsByLeague();
    const nat=C.nationalSchedules(byL,avg,20261026+((+room.season||2026)-2026));
    const prevT=await prevLeagueTables(c,room,room.season-1);
-   const eu=E.qualifyEurope({season:prevT?2:1,tables:prevT,uni});
+   const champs=prevT?await prevChampions(c,room,room.season-1):null;
+   const eu=E.qualifyEurope({season:prevT?2:1,tables:prevT,uni,champions:champs});
    const uclSched=C.europeLeaguePhase(eu.ucl);
    const elSched=C.europeLeaguePhase(eu.el);
    const cupSeeds={};for(const lg of E.LEAGUES)cupSeeds[lg.key]=cupSeedIds(lg.key,prevT);
@@ -116,7 +128,8 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
   const byL=clubsByLeague();
   const nat=C.nationalSchedules(byL,avg,20261026+((+room.season||2026)-2026));
   const prevT=await prevLeagueTables(pool,room,room.season-1);
-  const eu=E.qualifyEurope({season:prevT?2:1,tables:prevT,uni});
+  const champs=prevT?await prevChampions(pool,room,room.season-1):null;
+  const eu=E.qualifyEurope({season:prevT?2:1,tables:prevT,uni,champions:champs});
   const fx={leagues:nat,ucl:eu.ucl,el:eu.el,cupSeeds:{}};
   for(const lg of E.LEAGUES)fx.cupSeeds[lg.key]=cupSeedIds(lg.key,prevT);
   await q('UPDATE rooms SET fixtures=$2,version=version+1 WHERE id=$1 AND fixtures IS NULL',[room.id,JSON.stringify(fx)]);

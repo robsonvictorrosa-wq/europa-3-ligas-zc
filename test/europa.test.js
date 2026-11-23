@@ -183,7 +183,9 @@ const root=path.join(__dirname,'..');
     assert.strictEqual(tables[lg].length,20);
     assert.ok(tables[lg].every(x=>x.j===38),lg+' deveria ter 38 jogos');
   }
-  const uclChamps=tables.pl.filter(x=>x.pos<=10).map(x=>x.club_id);
+  const uclWinner=st.competitions.find(c=>c.kind==='ucl').champion;
+  const cupWinners=Object.fromEntries(st.competitions.filter(c=>c.kind==='cup').map(c=>[c.league_key,c.champion]));
+  assert.ok(uclWinner,'id do campeão da Champions');
 
   // nova temporada
   const N=await ok('POST','/api/rooms/LIGA/zc/admin/season/new',{confirm:'NOVA TEMPORADA',start:'2028-07-01',auto:false});
@@ -192,18 +194,43 @@ const root=path.join(__dirname,'..');
   await ok('POST','/api/rooms/LIGA/season/start',{confirm:true});
   const s2=await ok('GET','/api/rooms/LIGA/season');
   const ucl2=s2.competitions.find(c=>c.kind==='ucl');
+  const el2=s2.competitions.find(c=>c.kind==='el');
   const ut2=await ok('GET',`/api/rooms/LIGA/comp/${ucl2.id}/table`);
-  // ainda sem jogos, a tabela lista os 30 classificados
-  // Se a API só lista quem já jogou, gerar fixtures preview: lemos ucl seeds via fixtures
-  const fx2=await ok('GET','/api/rooms/LIGA/zc/fixtures');
-  const uclIds=fx2.rounds?null:null;
-  // fixtures payload has fx.ucl only on lobby; in season room.fixtures
-  // GET fixtures in season uses room.fixtures.ucl
-  // Our endpoint doesn't return ucl list directly. Advance one europe md later.
-  // Compare via starting an europe table after 0 games — standings includes all ids from matches (already inserted).
+  const et2=await ok('GET',`/api/rooms/LIGA/comp/${el2.id}/table`);
   assert.strictEqual(ut2.rows.length,30,'s2 Champions 30 times');
+  assert.strictEqual(et2.rows.length,30,'s2 Europa League 30 times');
   const s2ids=new Set(ut2.rows.map(x=>x.club_id));
-  for(const id of uclChamps)assert.ok(s2ids.has(id),'top 10 da Premier na Champions da 2ª temporada: '+id);
+  const s2el=new Set(et2.rows.map(x=>x.club_id));
+  assert.ok(s2ids.has(uclWinner),'campeão da Champions tem vaga na Champions seguinte');
+  for(const [lg,id] of Object.entries(cupWinners)){
+    assert.ok(id&&s2ids.has(id),'campeão da copa '+lg+' tem vaga na Champions seguinte');
+  }
+  for(const lg of ['pl','ll','sa']){
+    const rows=tables[lg];
+    const top10=rows.filter(x=>x.pos<=10).map(x=>x.club_id);
+    const tenth=rows.find(x=>x.pos===10).club_id;
+    const ninth=rows.find(x=>x.pos===9).club_id;
+    const cup=cupWinners[lg];
+    const cupPos=rows.find(x=>x.club_id===cup)?.pos;
+    const uclPos=rows.find(x=>x.club_id===uclWinner)?.pos;
+    const outside=[cup,uclWinner].filter((id,i,a)=>id&&a.indexOf(id)===i&&rows.some(x=>x.club_id===id&&x.pos>10));
+    for(const id of top10){
+      const isGuaranteed=id===cup||id===uclWinner;
+      const evicted=(outside.length>=1&&id===tenth&&!isGuaranteed)||(outside.length>=2&&id===ninth&&!isGuaranteed);
+      if(evicted){
+        assert.ok(!s2ids.has(id),'lugar cedido ('+lg+' pos '+(id===tenth?10:9)+') fora da Champions');
+        assert.ok(s2el.has(id),'lugar cedido foi para a Europa League');
+      }else{
+        assert.ok(s2ids.has(id),'top 10 da '+lg+' permanece na Champions (ou é campeão): '+id);
+      }
+    }
+    const inUcl=rows.filter(x=>s2ids.has(x.club_id));
+    const inEl=rows.filter(x=>s2el.has(x.club_id));
+    assert.strictEqual(inUcl.length,10,lg+' com 10 na Champions');
+    assert.strictEqual(inEl.length,10,lg+' com 10 na Europa League');
+    if(cupPos>10)console.log('  caso copa fora do top 10:',lg,'campeão pos',cupPos,'10º saiu?',!s2ids.has(tenth));
+    if(uclPos>10)console.log('  caso Champions fora do top 10: liga',lg,'pos',uclPos);
+  }
 
   console.log('europa.test.js OK');
   child.kill();

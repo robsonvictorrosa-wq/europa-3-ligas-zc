@@ -69,4 +69,64 @@ assert.strictEqual(fro.rank,60);assert.strictEqual(fro.budget,500e6);
 assert.ok(CF.season1_europe.ucl.includes('Inter'));
 assert.ok(CF.season1_europe.el.includes('Crystal Palace'));
 assert.ok(!CF.season1_europe.ucl.includes('Crystal Palace'));
+
+function tableOf(ids){return ids.map((club_id,i)=>({club_id,pos:i+1}));}
+function leagueIds(prefix){return [...Array(20)].map((_,i)=>prefix*100+(i+1));} // 1=melhor
+
+// Caso base: campeões já no top 10, nada muda
+{
+ const pl=leagueIds(1),ll=leagueIds(2),sa=leagueIds(3);
+ const tables={pl:tableOf(pl),ll:tableOf(ll),sa:tableOf(sa)};
+ const q=E.qualifyEurope({season:2,tables,champions:{ucl:pl[0],cups:{pl:pl[2],ll:ll[0],sa:sa[4]}}});
+ assert.deepStrictEqual(q.ucl,pl.slice(0,10).concat(ll.slice(0,10),sa.slice(0,10)));
+ assert.deepStrictEqual(q.el,pl.slice(10).concat(ll.slice(10),sa.slice(10)));
+}
+
+// Campeão da copa fora do top 10 toma a vaga do 10º; o 10º vai à Europa League
+{
+ const pl=leagueIds(1),ll=leagueIds(2),sa=leagueIds(3);
+ const tables={pl:tableOf(pl),ll:tableOf(ll),sa:tableOf(sa)};
+ const q=E.qualifyEurope({season:2,tables,champions:{ucl:ll[0],cups:{pl:pl[14],ll:ll[1],sa:sa[3]}}}); // PL 15º
+ assert.ok(q.ucl.includes(pl[14]),'campeão da copa (15º) na Champions');
+ assert.ok(!q.ucl.includes(pl[9]),'10º da liga sai da Champions');
+ assert.ok(q.el.includes(pl[9]),'10º vai à Europa League');
+ assert.ok(!q.el.includes(pl[14]));
+ assert.strictEqual(q.ucl.filter(id=>pl.includes(id)).length,10);
+ assert.strictEqual(q.el.filter(id=>pl.includes(id)).length,10);
+ assert.strictEqual(q.ucl.length,30);assert.strictEqual(q.el.length,30);
+}
+
+// Dois campeões fora do top 10 na mesma liga: saem o 10º e o 9º
+{
+ const pl=leagueIds(1),ll=leagueIds(2),sa=leagueIds(3);
+ const tables={pl:tableOf(pl),ll:tableOf(ll),sa:tableOf(sa)};
+ const q=E.qualifyEurope({season:2,tables,champions:{ucl:pl[11],cups:{pl:pl[14],ll:ll[0],sa:sa[0]}}}); // 12º e 15º
+ assert.ok(q.ucl.includes(pl[11])&&q.ucl.includes(pl[14]));
+ assert.ok(!q.ucl.includes(pl[8])&&!q.ucl.includes(pl[9]),'9º e 10º saem');
+ assert.ok(q.el.includes(pl[8])&&q.el.includes(pl[9]));
+ assert.strictEqual(q.ucl.filter(id=>pl.includes(id)).length,10);
+}
+
+// Mesmo time ganha Champions e copa fora do top 10: conta uma vaga só (sai só o 10º)
+{
+ const pl=leagueIds(1),ll=leagueIds(2),sa=leagueIds(3);
+ const tables={pl:tableOf(pl),ll:tableOf(ll),sa:tableOf(sa)};
+ const q=E.qualifyEurope({season:2,tables,champions:{ucl:pl[12],cups:{pl:pl[12],ll:ll[0],sa:sa[0]}}});
+ assert.ok(q.ucl.includes(pl[12]));
+ assert.ok(!q.ucl.includes(pl[9]));
+ assert.ok(q.ucl.includes(pl[8]),'9º permanece (só uma vaga extra)');
+ assert.strictEqual(q.ucl.filter(id=>id===pl[12]).length,1);
+ assert.strictEqual(q.ucl.filter(id=>pl.includes(id)).length,10);
+}
+
+// Campeão da Champions já é o 10º e a copa é de um 15º: o 10º (campeão) fica, sai o 9º
+{
+ const pl=leagueIds(1),ll=leagueIds(2),sa=leagueIds(3);
+ const tables={pl:tableOf(pl),ll:tableOf(ll),sa:tableOf(sa)};
+ const q=E.qualifyEurope({season:2,tables,champions:{ucl:pl[9],cups:{pl:pl[14],ll:ll[0],sa:sa[0]}}});
+ assert.ok(q.ucl.includes(pl[9]),'10º campeão da Champions permanece');
+ assert.ok(q.ucl.includes(pl[14]));
+ assert.ok(!q.ucl.includes(pl[8]),'9º cede a vaga');
+}
+
 console.log('comps.test.js OK');
