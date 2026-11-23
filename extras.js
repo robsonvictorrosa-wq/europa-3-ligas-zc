@@ -337,7 +337,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
   const [u]=await q('UPDATE users SET is_admin=$2 WHERE id=$1 RETURNING nick',[uid,on]);if(!u)throw fail('Usuário não encontrado');if(!on&&envAdmins().includes(u.nick.toLowerCase()))throw fail('Este apelido é admin pela variável ADMIN_APELIDOS no Render');s.json({ok:1});}));
  // ---------- central da liga (admin) ----------
  app.post('/api/rooms/:code/zc/admin/assign',auth,wrap(async(r,s)=>{const room=await member(r);own(room,r);const uid=+r.body?.user_id,cid=r.body?.club_id?+r.body.club_id:null;
-  if(cid&&!L.CLUBS.includes(cid))throw fail('Clube fora da Libertadores ZC');if(cid&&room.status!=='lobby'){const [t]=await q('SELECT 1 FROM room_managers WHERE room_id=$1 AND club_id=$2',[room.id,cid]);if(t)throw fail('Clube já tem técnico');}
+  if(cid&&!L.CLUBS.includes(cid))throw fail('Clube fora das 3 ligas');if(cid&&room.status!=='lobby'){const [t]=await q('SELECT 1 FROM room_managers WHERE room_id=$1 AND club_id=$2',[room.id,cid]);if(t)throw fail('Clube já tem técnico');}
   try{await q('UPDATE room_managers SET club_id=$3 WHERE room_id=$1 AND user_id=$2',[room.id,uid,cid]);}catch(e){if(e.code==='23505')throw fail('Clube já tem técnico',409);throw e;}
   await bump(room.id,`Admin definiu clube de um técnico: ${cid?cname(cid):'sem clube'}`);s.json({ok:1});}));
  app.post('/api/rooms/:code/zc/admin/remove',auth,wrap(async(r,s)=>{const room=await member(r);own(room,r);const uid=+r.body?.user_id;if(uid===room.owner_id)throw fail('O administrador não pode se remover');

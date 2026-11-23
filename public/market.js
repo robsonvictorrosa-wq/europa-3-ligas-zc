@@ -1,4 +1,4 @@
-window.trSt=t=>t.status==='contested'?` · <b style="color:#D4AF37">Contestada por ${esc(t.contested_by||'admin')} em ${esc(t.contested_quando||'')}</b>`:t.status==='cancelled'?` · <b style="color:#C5C5C5">Cancelada por ${esc(t.cancelled_by||'admin')} em ${esc(t.cancelled_quando||'')}</b>`:'';
+window.trSt=t=>t.status==='contested'?` · <b style="color:#E5E7EB">Contestada por ${esc(t.contested_by||'admin')} em ${esc(t.contested_quando||'')}</b>`:t.status==='cancelled'?` · <b style="color:#C5C5C5">Cancelada por ${esc(t.cancelled_by||'admin')} em ${esc(t.cancelled_quando||'')}</b>`:'';
 // Etapa 4: Mercado de transferências
 const del=(u,b)=>fetch('/api'+u,{method:'DELETE',headers:H(),body:JSON.stringify(b||{})}).then(async r=>{const j=await r.json();if(!r.ok)throw new Error(j.error||'Erro');return j;});
 let MK=null,MTAB='buscar';
@@ -41,7 +41,7 @@ window.rescindir=(id,n)=>{if(!confirm(`Rescindir com ${n}? Ele vira agente livre
 async function mAjuda(){const t=await fetch('/mercado.html').then(r=>r.text());$('#mt').innerHTML=`<div class="card" style="cursor:default;line-height:1.6">${t}</div>`;}
 window.negociar=async id=>{let p;try{p=await get(`/rooms/${ROOM}/market/player/${id}`);}catch(e){return alert(e.message)}const own=p.own,free=p.club==='Livre';
  const mine=own?[]:(await get(`/rooms/${ROOM}/career`).catch(()=>({club:{players:[]}}))).club.players;
- $('#modal').innerHTML=`<div class="pc"><span class="x" onclick="closeM()">×</span><h1 style="margin:0">${esc(p.name)} ${ovp(p)}</h1><div class="sub">${p.primary_position}${(p.positions||[]).filter(x=>x!==p.primary_position).length?' · '+(p.positions||[]).filter(x=>x!==p.primary_position).join(', '):''} · ${p.age} anos · POT ${p.potential} · ${esc(p.club)}${p.manager?' (👤 '+esc(p.manager)+')':''}${p.shielded?' · <b style="color:#E8E8E8">🛡️ Blindado</b>':''}${p.listed?' · <b style="color:#D4AF37">🤝 Negociável</b>':''}</div>
+ $('#modal').innerHTML=`<div class="pc"><span class="x" onclick="closeM()">×</span><h1 style="margin:0">${esc(p.name)} ${ovp(p)}</h1><div class="sub">${p.primary_position}${(p.positions||[]).filter(x=>x!==p.primary_position).length?' · '+(p.positions||[]).filter(x=>x!==p.primary_position).join(', '):''} · ${p.age} anos · POT ${p.potential} · ${esc(p.club)}${p.manager?' (👤 '+esc(p.manager)+')':''}${p.shielded?' · <b style="color:#E8E8E8">🛡️ Blindado</b>':''}${p.listed?' · <b style="color:#E5E7EB">🤝 Negociável</b>':''}</div>
  <div class="kpis"><div class="kpi"><span>Valor</span><b>${fm(p.market_value)}</b></div><div class="kpi"><span>Salário</span><b>${fm(p.wage)}/sem</b></div><div class="kpi"><span>Multa</span><b>${p.release_clause?fm(p.release_clause):'—'}</b></div><div class="kpi"><span>Contrato até</span><b>${p.contract_end??'—'}</b></div><div class="kpi"><span>No clube</span><b>${esc(p.importance||'—')}</b></div>${p.expected_role?`<div class="kpi"><span>Seria no seu time</span><b>${RL[p.expected_role]}</b></div>`:''}</div>
  <div id="notasP"></div>
  
