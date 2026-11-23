@@ -40,7 +40,7 @@ async function inicio(){if(!await need(''))return;
  app.innerHTML=`<div class="kicker">Europa 3 Ligas · Temporada ${season} · ${phase}</div>${!OV.me?.club_id&&!OV.admin?'<div class="card waitbox"><b>Aguardando o admin definir seu time</b><p class="sub" style="margin:4px 0 0">Sua conta está criada. Assim que o administrador escolher o seu clube na Central da liga, ele aparece aqui.</p></div>':''}
  <div class="mosaic">
   <a class="tile sel t-camp" href="#/campeonato"><h2>Campeonato</h2><p>Liga, fase atual e simulação da temporada.</p></a>
-  <div class="tile photo t-vis"><div class="mark"><img src="/logo.png" alt="Europa 3 Ligas ZC"></div></div>
+  <div class="tile photo t-vis"><div class="mark"><img src="/logo-art.jpg" alt="ZC Super Modo Carreira League"></div></div>
   <a class="tile t-merc" href="#/mercado"><h2>Mercado</h2><p>Propostas, observações e contratações.</p></a>
   <a class="tile t-esc" href="#/escalacao"><h2>Escalação</h2><p>Titulares, banco e tática.</p></a>
   <a class="tile t-jog" href="#/jogos"><h2>Jogos</h2><p>Rodadas e confrontos.</p></a>
