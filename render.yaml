@@ -1,0 +1,21 @@
+# Europa 3 Ligas ZC – serviço NOVO (não aponta para o Libertadores ZC).
+# Plano Free: dorme após 15 min sem acesso (sem keep-awake, por decisão do Robson).
+# ETAPA 1: este arquivo está pronto, mas o serviço ainda NÃO foi criado no Render.
+services:
+  - type: web
+    name: europa-3-ligas-zc
+    runtime: node
+    plan: free
+    region: virginia
+    branch: main
+    buildCommand: npm ci && node import.js && python3 scripts/gen-crests.py
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false # banco Neon próprio desta versão (ainda não provisionado na etapa 1).
+      - key: ADMIN_APELIDOS
+        sync: false # opcional; Robshow e Duque já são admins por padrão

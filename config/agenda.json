@@ -1,0 +1,9 @@
+{
+  "_doc": "Agenda do Europa 3 Ligas ZC (horário de Brasília). Sem data de início fixa: o admin escolhe no painel e agenda.js gera o calendário. paused=true até o admin ligar a agenda automática.",
+  "paused": true,
+  "room": "LIGA",
+  "pre_market_during_rounds": true,
+  "penalty_at_market_close": true,
+  "slots": ["12:00", "19:00"],
+  "start_slot": 0
+}

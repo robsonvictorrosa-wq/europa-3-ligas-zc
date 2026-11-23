@@ -1,0 +1,24 @@
+{
+  "name": "europa-3-ligas-zc",
+  "version": "1.0.0",
+  "description": "Modo carreira: Premier League, La Liga e Serie A (Europa 3 Ligas ZC)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node import.js && python3 scripts/gen-crests.py",
+    "test": "node test/comps.test.js && node test/europa.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "compression": "^1.8.2",
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
