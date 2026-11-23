@@ -1,5 +1,5 @@
 {
-  "_doc": "Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. Verbas pelas faixas do ZC 50 escaladas a 60 clubes, ranking global de over (média dos 11 maiores).",
+  "_doc": "Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. Verba: €37,5 mi por ponto de over (média dos 18 maiores do elenco inicial; desempate pela média dos 11) abaixo do melhor (Real Madrid), arredondada a múltiplo de €25 mi, teto €500 mi.",
   "name": "Europa 3 Ligas ZC",
   "default_budget": 20000000,
   "default_wage_budget": 400000,
@@ -37,43 +37,6 @@
       "cup": "Coppa Italia"
     }
   ],
-  "budget_bands": [
-    {
-      "from": 1,
-      "to": 7,
-      "amount": 0
-    },
-    {
-      "from": 8,
-      "to": 15,
-      "amount": 50000000
-    },
-    {
-      "from": 16,
-      "to": 22,
-      "amount": 100000000
-    },
-    {
-      "from": 23,
-      "to": 30,
-      "amount": 200000000
-    },
-    {
-      "from": 31,
-      "to": 45,
-      "amount": 300000000
-    },
-    {
-      "from": 46,
-      "to": 52,
-      "amount": 400000000
-    },
-    {
-      "from": 53,
-      "to": 60,
-      "amount": 500000000
-    }
-  ],
   "prizes": [
     {
       "from": 1,
@@ -107,7 +70,7 @@
     }
   ],
   "_doc_prizes": "Premiação por posição em cada liga nacional (provisória, no molde do ZC 50). Copas e europeias ainda sem prêmio de título nesta etapa.",
-  "_doc_budget": "Rank 1–7 (maior over): € 0 · 8–15: 50 mi · 16–22: 100 mi · 23–30: 200 mi · 31–45: 300 mi · 46–52: 400 mi · 53–60 (menor over): 500 mi. Escala 1,5× das faixas de 40 clubes do ZC 50 (5/5/10/5/5/5/5 → 8/7/15/8/7/8/7, com 7+8 nas pontas para somar 60).",
+  "_doc_budget": "Verba inicial (Robson 23/11/2026): over = média dos 18 maiores overs do elenco inicial (desempate: média dos 11). Real Madrid (85,17) recebe €0. Cada ponto abaixo vale €37,5 mi, arredondado a múltiplo de €25 mi, teto €500 mi. Total da liga €17.500 mi.",
   "season1_europe": {
     "ucl": [
       "Arsenal",
@@ -116,78 +79,65 @@
       "Man Utd",
       "Chelsea",
       "Spurs",
-      "Aston Villa",
       "Newcastle Utd",
+      "Aston Villa",
       "Nott'm Forest",
-      "Sunderland",
-      "FC Barcelona",
+      "Crystal Palace",
       "Real Madrid",
+      "FC Barcelona",
       "Atlético de Madrid",
       "Athletic Bilbao",
       "Villarreal CF",
       "Real Betis",
       "Real Sociedad",
-      "Rayo Vallecano",
       "Celta",
+      "Rayo Vallecano",
       "CA Osasuna",
       "Inter",
       "SSC Napoli",
+      "Juventus FC",
       "AS Roma",
       "Milan",
-      "Juventus FC",
       "Atalanta",
       "Como 1907",
       "SS Lazio",
-      "ACF Fiorentina",
-      "Bologna FC"
+      "Bologna FC",
+      "ACF Fiorentina"
     ],
     "el": [
-      "Crystal Palace",
       "Brentford",
-      "Everton",
+      "Sunderland",
       "AFC Bournemouth",
       "Brighton",
+      "Everton",
       "Leeds United",
       "Fulham",
       "Ipswich Town",
       "Hull City",
       "Coventry City",
       "Valencia CF",
-      "Sevilla FC",
-      "RC Deportivo",
       "RCD Espanyol",
+      "Sevilla FC",
       "Getafe CF",
+      "RC Deportivo",
       "D. Alavés",
       "Levante UD",
-      "R. Racing Club",
       "Elche CF",
+      "R. Racing Club",
       "Málaga CF",
       "Torino FC",
       "Sassuolo",
       "Udinese Calcio",
-      "Genoa CFC",
       "Venezia FC",
-      "Parma Calcio",
+      "Genoa CFC",
       "Cagliari Calcio",
+      "Parma Calcio",
       "AC Monza",
-      "US Lecce",
-      "Frosinone Calcio"
+      "Frosinone Calcio",
+      "US Lecce"
     ]
   },
   "clubs": [
-    {
-      "db": "FC Barcelona",
-      "name": "FC Barcelona",
-      "abbr": "BAR",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 27,
-      "ovr11": 86.9,
-      "ovr18": 84.8,
-      "rank": 1,
-      "budget": 0
-    },
     {
       "db": "Real Madrid",
       "name": "Real Madrid",
@@ -196,9 +146,9 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 32,
-      "ovr11": 86.6,
-      "ovr18": 85.2,
-      "rank": 2,
+      "ovr11": 86.64,
+      "ovr18": 85.17,
+      "rank": 1,
       "budget": 0
     },
     {
@@ -209,10 +159,23 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 23,
-      "ovr11": 86.4,
-      "ovr18": 84.8,
+      "ovr11": 86.36,
+      "ovr18": 84.83,
+      "rank": 2,
+      "budget": 25000000
+    },
+    {
+      "db": "FC Barcelona",
+      "name": "FC Barcelona",
+      "abbr": "BAR",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 27,
+      "ovr11": 86.91,
+      "ovr18": 84.78,
       "rank": 3,
-      "budget": 0
+      "budget": 25000000
     },
     {
       "db": "Manchester City",
@@ -223,9 +186,9 @@
       "squad": "db",
       "n_players": 26,
       "ovr11": 86,
-      "ovr18": 84.3,
+      "ovr18": 84.33,
       "rank": 4,
-      "budget": 0
+      "budget": 25000000
     },
     {
       "db": "Liverpool",
@@ -235,23 +198,10 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 29,
-      "ovr11": 85.2,
-      "ovr18": 83.1,
+      "ovr11": 85.18,
+      "ovr18": 83.11,
       "rank": 5,
-      "budget": 0
-    },
-    {
-      "db": "Lombardia FC",
-      "name": "Inter",
-      "abbr": "INT",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 24,
-      "ovr11": 84.3,
-      "ovr18": 82.3,
-      "rank": 6,
-      "budget": 0
+      "budget": 75000000
     },
     {
       "db": "Atlético de Madrid",
@@ -261,10 +211,23 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 25,
-      "ovr11": 83.9,
-      "ovr18": 82.8,
+      "ovr11": 83.91,
+      "ovr18": 82.83,
+      "rank": 6,
+      "budget": 100000000
+    },
+    {
+      "db": "Lombardia FC",
+      "name": "Inter",
+      "abbr": "INT",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 24,
+      "ovr11": 84.27,
+      "ovr18": 82.28,
       "rank": 7,
-      "budget": 0
+      "budget": 100000000
     },
     {
       "db": "Man Utd",
@@ -274,10 +237,10 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 30,
-      "ovr11": 83.2,
-      "ovr18": 81.6,
+      "ovr11": 83.18,
+      "ovr18": 81.61,
       "rank": 8,
-      "budget": 50000000
+      "budget": 125000000
     },
     {
       "db": "Chelsea",
@@ -287,36 +250,10 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 29,
-      "ovr11": 82.7,
-      "ovr18": 81.1,
+      "ovr11": 82.73,
+      "ovr18": 81.11,
       "rank": 9,
-      "budget": 50000000
-    },
-    {
-      "db": "SSC Napoli",
-      "name": "SSC Napoli",
-      "abbr": "NAP",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 26,
-      "ovr11": 82.2,
-      "ovr18": 80.4,
-      "rank": 10,
-      "budget": 50000000
-    },
-    {
-      "db": "AS Roma",
-      "name": "AS Roma",
-      "abbr": "ROM",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 25,
-      "ovr11": 82.2,
-      "ovr18": 80.2,
-      "rank": 11,
-      "budget": 50000000
+      "budget": 150000000
     },
     {
       "db": "Spurs",
@@ -326,23 +263,23 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 28,
-      "ovr11": 81.7,
-      "ovr18": 80.7,
-      "rank": 12,
-      "budget": 50000000
+      "ovr11": 81.73,
+      "ovr18": 80.67,
+      "rank": 10,
+      "budget": 175000000
     },
     {
-      "db": "Milano FC",
-      "name": "Milan",
-      "abbr": "MIL",
+      "db": "SSC Napoli",
+      "name": "SSC Napoli",
+      "abbr": "NAP",
       "league": "sa",
       "country": "Itália",
       "squad": "db",
-      "n_players": 28,
-      "ovr11": 81.7,
-      "ovr18": 79.8,
-      "rank": 13,
-      "budget": 50000000
+      "n_players": 26,
+      "ovr11": 82.18,
+      "ovr18": 80.44,
+      "rank": 11,
+      "budget": 175000000
     },
     {
       "db": "Juventus FC",
@@ -352,10 +289,62 @@
       "country": "Itália",
       "squad": "db",
       "n_players": 30,
-      "ovr11": 81.5,
-      "ovr18": 80.4,
+      "ovr11": 81.55,
+      "ovr18": 80.39,
+      "rank": 12,
+      "budget": 175000000
+    },
+    {
+      "db": "AS Roma",
+      "name": "AS Roma",
+      "abbr": "ROM",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 25,
+      "ovr11": 82.18,
+      "ovr18": 80.17,
+      "rank": 13,
+      "budget": 200000000
+    },
+    {
+      "db": "Milano FC",
+      "name": "Milan",
+      "abbr": "MIL",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 28,
+      "ovr11": 81.73,
+      "ovr18": 79.78,
       "rank": 14,
-      "budget": 50000000
+      "budget": 200000000
+    },
+    {
+      "db": "Newcastle Utd",
+      "name": "Newcastle Utd",
+      "abbr": "NEW",
+      "league": "pl",
+      "country": "Inglaterra",
+      "squad": "db",
+      "n_players": 26,
+      "ovr11": 80.55,
+      "ovr18": 79.5,
+      "rank": 15,
+      "budget": 225000000
+    },
+    {
+      "db": "Aston Villa",
+      "name": "Aston Villa",
+      "abbr": "AVL",
+      "league": "pl",
+      "country": "Inglaterra",
+      "squad": "db",
+      "n_players": 28,
+      "ovr11": 80.64,
+      "ovr18": 79.33,
+      "rank": 16,
+      "budget": 225000000
     },
     {
       "db": "Athletic Bilbao",
@@ -366,35 +355,9 @@
       "squad": "db",
       "n_players": 29,
       "ovr11": 81,
-      "ovr18": 79.2,
-      "rank": 15,
-      "budget": 50000000
-    },
-    {
-      "db": "Aston Villa",
-      "name": "Aston Villa",
-      "abbr": "AVL",
-      "league": "pl",
-      "country": "Inglaterra",
-      "squad": "db",
-      "n_players": 28,
-      "ovr11": 80.6,
-      "ovr18": 79.3,
-      "rank": 16,
-      "budget": 100000000
-    },
-    {
-      "db": "Newcastle Utd",
-      "name": "Newcastle Utd",
-      "abbr": "NEW",
-      "league": "pl",
-      "country": "Inglaterra",
-      "squad": "db",
-      "n_players": 26,
-      "ovr11": 80.5,
-      "ovr18": 79.5,
+      "ovr18": 79.22,
       "rank": 17,
-      "budget": 100000000
+      "budget": 225000000
     },
     {
       "db": "Nott'm Forest",
@@ -404,36 +367,10 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 24,
-      "ovr11": 80.5,
-      "ovr18": 79.2,
+      "ovr11": 80.45,
+      "ovr18": 79.17,
       "rank": 18,
-      "budget": 100000000
-    },
-    {
-      "db": "Villarreal CF",
-      "name": "Villarreal CF",
-      "abbr": "VIL",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 24,
-      "ovr11": 80.2,
-      "ovr18": 78.7,
-      "rank": 19,
-      "budget": 100000000
-    },
-    {
-      "db": "Sunderland",
-      "name": "Sunderland",
-      "abbr": "SUN",
-      "league": "pl",
-      "country": "Inglaterra",
-      "squad": "db",
-      "n_players": 28,
-      "ovr11": 80.1,
-      "ovr18": 78.6,
-      "rank": 20,
-      "budget": 100000000
+      "budget": 225000000
     },
     {
       "db": "Crystal Palace",
@@ -444,9 +381,9 @@
       "squad": "db",
       "n_players": 28,
       "ovr11": 80,
-      "ovr18": 78.9,
-      "rank": 21,
-      "budget": 100000000
+      "ovr18": 78.89,
+      "rank": 19,
+      "budget": 225000000
     },
     {
       "db": "Bergamo Calcio",
@@ -456,10 +393,23 @@
       "country": "Itália",
       "squad": "db",
       "n_players": 25,
-      "ovr11": 79.9,
-      "ovr18": 78.8,
-      "rank": 22,
-      "budget": 100000000
+      "ovr11": 79.91,
+      "ovr18": 78.83,
+      "rank": 20,
+      "budget": 250000000
+    },
+    {
+      "db": "Villarreal CF",
+      "name": "Villarreal CF",
+      "abbr": "VIL",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 24,
+      "ovr11": 80.18,
+      "ovr18": 78.72,
+      "rank": 21,
+      "budget": 250000000
     },
     {
       "db": "Real Betis",
@@ -469,10 +419,10 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 27,
-      "ovr11": 79.9,
-      "ovr18": 78.7,
-      "rank": 23,
-      "budget": 200000000
+      "ovr11": 79.91,
+      "ovr18": 78.72,
+      "rank": 22,
+      "budget": 250000000
     },
     {
       "db": "Brentford",
@@ -482,36 +432,23 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 29,
-      "ovr11": 79.7,
-      "ovr18": 78.6,
-      "rank": 24,
-      "budget": 200000000
+      "ovr11": 79.73,
+      "ovr18": 78.61,
+      "rank": 23,
+      "budget": 250000000
     },
     {
-      "db": "Everton",
-      "name": "Everton",
-      "abbr": "EVE",
+      "db": "Sunderland",
+      "name": "Sunderland",
+      "abbr": "SUN",
       "league": "pl",
       "country": "Inglaterra",
       "squad": "db",
-      "n_players": 21,
-      "ovr11": 79.7,
-      "ovr18": 77.9,
-      "rank": 25,
-      "budget": 200000000
-    },
-    {
-      "db": "Como 1907",
-      "name": "Como 1907",
-      "abbr": "COM",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 27,
-      "ovr11": 79.6,
-      "ovr18": 78.3,
-      "rank": 26,
-      "budget": 200000000
+      "n_players": 28,
+      "ovr11": 80.09,
+      "ovr18": 78.56,
+      "rank": 24,
+      "budget": 250000000
     },
     {
       "db": "AFC Bournemouth",
@@ -521,10 +458,23 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 28,
-      "ovr11": 79.5,
-      "ovr18": 78.6,
-      "rank": 27,
-      "budget": 200000000
+      "ovr11": 79.45,
+      "ovr18": 78.56,
+      "rank": 25,
+      "budget": 250000000
+    },
+    {
+      "db": "Como 1907",
+      "name": "Como 1907",
+      "abbr": "COM",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 27,
+      "ovr11": 79.64,
+      "ovr18": 78.33,
+      "rank": 26,
+      "budget": 250000000
     },
     {
       "db": "Brighton",
@@ -534,10 +484,23 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 30,
-      "ovr11": 79.5,
-      "ovr18": 78.3,
+      "ovr11": 79.45,
+      "ovr18": 78.28,
+      "rank": 27,
+      "budget": 250000000
+    },
+    {
+      "db": "Everton",
+      "name": "Everton",
+      "abbr": "EVE",
+      "league": "pl",
+      "country": "Inglaterra",
+      "squad": "db",
+      "n_players": 21,
+      "ovr11": 79.73,
+      "ovr18": 77.89,
       "rank": 28,
-      "budget": 200000000
+      "budget": 275000000
     },
     {
       "db": "Real Sociedad",
@@ -547,23 +510,10 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 25,
-      "ovr11": 79.3,
-      "ovr18": 77.8,
+      "ovr11": 79.27,
+      "ovr18": 77.78,
       "rank": 29,
-      "budget": 200000000
-    },
-    {
-      "db": "Rayo Vallecano",
-      "name": "Rayo Vallecano",
-      "abbr": "RAY",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 31,
-      "ovr11": 78.5,
-      "ovr18": 77,
-      "rank": 30,
-      "budget": 200000000
+      "budget": 275000000
     },
     {
       "db": "Leeds United",
@@ -573,9 +523,9 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 29,
-      "ovr11": 78.4,
-      "ovr18": 77.4,
-      "rank": 31,
+      "ovr11": 78.36,
+      "ovr18": 77.44,
+      "rank": 30,
       "budget": 300000000
     },
     {
@@ -586,9 +536,9 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 26,
-      "ovr11": 78.2,
-      "ovr18": 77.1,
-      "rank": 32,
+      "ovr11": 78.18,
+      "ovr18": 77.11,
+      "rank": 31,
       "budget": 300000000
     },
     {
@@ -599,8 +549,21 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 26,
-      "ovr11": 78.2,
-      "ovr18": 77.1,
+      "ovr11": 78.18,
+      "ovr18": 77.11,
+      "rank": 32,
+      "budget": 300000000
+    },
+    {
+      "db": "Rayo Vallecano",
+      "name": "Rayo Vallecano",
+      "abbr": "RAY",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 31,
+      "ovr11": 78.55,
+      "ovr18": 77,
       "rank": 33,
       "budget": 300000000
     },
@@ -613,9 +576,9 @@
       "squad": "db",
       "n_players": 32,
       "ovr11": 78,
-      "ovr18": 76.8,
+      "ovr18": 76.83,
       "rank": 34,
-      "budget": 300000000
+      "budget": 325000000
     },
     {
       "db": "CA Osasuna",
@@ -625,36 +588,10 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 26,
-      "ovr11": 77.6,
-      "ovr18": 76.6,
+      "ovr11": 77.64,
+      "ovr18": 76.61,
       "rank": 35,
-      "budget": 300000000
-    },
-    {
-      "db": "ACF Fiorentina",
-      "name": "ACF Fiorentina",
-      "abbr": "FIO",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 24,
-      "ovr11": 77.6,
-      "ovr18": 75.8,
-      "rank": 36,
-      "budget": 300000000
-    },
-    {
-      "db": "Bologna FC",
-      "name": "Bologna FC",
-      "abbr": "BOL",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 27,
-      "ovr11": 77.1,
-      "ovr18": 76,
-      "rank": 37,
-      "budget": 300000000
+      "budget": 325000000
     },
     {
       "db": "Valencia CF",
@@ -665,9 +602,22 @@
       "squad": "db",
       "n_players": 30,
       "ovr11": 77,
-      "ovr18": 76.3,
-      "rank": 38,
-      "budget": 300000000
+      "ovr18": 76.33,
+      "rank": 36,
+      "budget": 325000000
+    },
+    {
+      "db": "Bologna FC",
+      "name": "Bologna FC",
+      "abbr": "BOL",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 27,
+      "ovr11": 77.09,
+      "ovr18": 76,
+      "rank": 37,
+      "budget": 350000000
     },
     {
       "db": "Ipswich Town",
@@ -678,48 +628,22 @@
       "squad": "db",
       "n_players": 28,
       "ovr11": 77,
-      "ovr18": 75.9,
-      "rank": 39,
-      "budget": 300000000
+      "ovr18": 75.94,
+      "rank": 38,
+      "budget": 350000000
     },
     {
-      "db": "Torino FC",
-      "name": "Torino FC",
-      "abbr": "TOR",
+      "db": "ACF Fiorentina",
+      "name": "ACF Fiorentina",
+      "abbr": "FIO",
       "league": "sa",
       "country": "Itália",
       "squad": "db",
-      "n_players": 28,
-      "ovr11": 76.7,
-      "ovr18": 75.4,
-      "rank": 40,
-      "budget": 300000000
-    },
-    {
-      "db": "Sevilla FC",
-      "name": "Sevilla FC",
-      "abbr": "SEV",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 27,
-      "ovr11": 76.6,
-      "ovr18": 75.5,
-      "rank": 41,
-      "budget": 300000000
-    },
-    {
-      "db": "RC Deportivo",
-      "name": "RC Deportivo",
-      "abbr": "DEP",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 31,
-      "ovr11": 76.5,
-      "ovr18": 75.1,
-      "rank": 42,
-      "budget": 300000000
+      "n_players": 24,
+      "ovr11": 77.64,
+      "ovr18": 75.83,
+      "rank": 39,
+      "budget": 350000000
     },
     {
       "db": "RCD Espanyol",
@@ -729,10 +653,36 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 28,
-      "ovr11": 76.4,
-      "ovr18": 75.6,
-      "rank": 43,
-      "budget": 300000000
+      "ovr11": 76.36,
+      "ovr18": 75.56,
+      "rank": 40,
+      "budget": 350000000
+    },
+    {
+      "db": "Sevilla FC",
+      "name": "Sevilla FC",
+      "abbr": "SEV",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 27,
+      "ovr11": 76.64,
+      "ovr18": 75.5,
+      "rank": 41,
+      "budget": 375000000
+    },
+    {
+      "db": "Torino FC",
+      "name": "Torino FC",
+      "abbr": "TOR",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 28,
+      "ovr11": 76.73,
+      "ovr18": 75.39,
+      "rank": 42,
+      "budget": 375000000
     },
     {
       "db": "Getafe CF",
@@ -742,10 +692,23 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 28,
-      "ovr11": 76.2,
-      "ovr18": 75.1,
+      "ovr11": 76.18,
+      "ovr18": 75.11,
+      "rank": 43,
+      "budget": 375000000
+    },
+    {
+      "db": "RC Deportivo",
+      "name": "RC Deportivo",
+      "abbr": "DEP",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 31,
+      "ovr11": 76.45,
+      "ovr18": 75.06,
       "rank": 44,
-      "budget": 300000000
+      "budget": 375000000
     },
     {
       "db": "Sassuolo",
@@ -755,22 +718,9 @@
       "country": "Itália",
       "squad": "db",
       "n_players": 34,
-      "ovr11": 76.1,
-      "ovr18": 74.7,
+      "ovr11": 76.09,
+      "ovr18": 74.67,
       "rank": 45,
-      "budget": 300000000
-    },
-    {
-      "db": "D. Alavés",
-      "name": "D. Alavés",
-      "abbr": "ALA",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 27,
-      "ovr11": 75.7,
-      "ovr18": 74.1,
-      "rank": 46,
       "budget": 400000000
     },
     {
@@ -781,35 +731,9 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 33,
-      "ovr11": 75.5,
+      "ovr11": 75.45,
       "ovr18": 74.5,
-      "rank": 47,
-      "budget": 400000000
-    },
-    {
-      "db": "Udinese Calcio",
-      "name": "Udinese Calcio",
-      "abbr": "UDI",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 28,
-      "ovr11": 75.5,
-      "ovr18": 74,
-      "rank": 48,
-      "budget": 400000000
-    },
-    {
-      "db": "Levante UD",
-      "name": "Levante UD",
-      "abbr": "LEV",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 26,
-      "ovr11": 75.3,
-      "ovr18": 73.4,
-      "rank": 49,
+      "rank": 46,
       "budget": 400000000
     },
     {
@@ -820,10 +744,62 @@
       "country": "Inglaterra",
       "squad": "db",
       "n_players": 30,
-      "ovr11": 75.2,
+      "ovr11": 75.18,
       "ovr18": 74.5,
-      "rank": 50,
+      "rank": 47,
       "budget": 400000000
+    },
+    {
+      "db": "D. Alavés",
+      "name": "D. Alavés",
+      "abbr": "ALA",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 27,
+      "ovr11": 75.73,
+      "ovr18": 74.11,
+      "rank": 48,
+      "budget": 425000000
+    },
+    {
+      "db": "Udinese Calcio",
+      "name": "Udinese Calcio",
+      "abbr": "UDI",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 28,
+      "ovr11": 75.45,
+      "ovr18": 74,
+      "rank": 49,
+      "budget": 425000000
+    },
+    {
+      "db": "Venezia FC",
+      "name": "Venezia FC",
+      "abbr": "VEN",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 35,
+      "ovr11": 74.82,
+      "ovr18": 73.61,
+      "rank": 50,
+      "budget": 425000000
+    },
+    {
+      "db": "Levante UD",
+      "name": "Levante UD",
+      "abbr": "LEV",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 26,
+      "ovr11": 75.27,
+      "ovr18": 73.39,
+      "rank": 51,
+      "budget": 450000000
     },
     {
       "db": "Genoa CFC",
@@ -834,48 +810,9 @@
       "squad": "db",
       "n_players": 29,
       "ovr11": 75,
-      "ovr18": 73.3,
-      "rank": 51,
-      "budget": 400000000
-    },
-    {
-      "db": "Venezia FC",
-      "name": "Venezia FC",
-      "abbr": "VEN",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 35,
-      "ovr11": 74.8,
-      "ovr18": 73.6,
+      "ovr18": 73.33,
       "rank": 52,
-      "budget": 400000000
-    },
-    {
-      "db": "R. Racing Club",
-      "name": "R. Racing Club",
-      "abbr": "RAC",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 26,
-      "ovr11": 74.7,
-      "ovr18": 72.8,
-      "rank": 53,
-      "budget": 500000000
-    },
-    {
-      "db": "Parma Calcio",
-      "name": "Parma Calcio",
-      "abbr": "PAR",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 27,
-      "ovr11": 74.5,
-      "ovr18": 72.7,
-      "rank": 54,
-      "budget": 500000000
+      "budget": 450000000
     },
     {
       "db": "Elche CF",
@@ -885,10 +822,10 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 31,
-      "ovr11": 74.4,
-      "ovr18": 73.1,
-      "rank": 55,
-      "budget": 500000000
+      "ovr11": 74.36,
+      "ovr18": 73.06,
+      "rank": 53,
+      "budget": 450000000
     },
     {
       "db": "Cagliari Calcio",
@@ -898,10 +835,36 @@
       "country": "Itália",
       "squad": "db",
       "n_players": 31,
-      "ovr11": 74.3,
-      "ovr18": 72.9,
+      "ovr11": 74.27,
+      "ovr18": 72.94,
+      "rank": 54,
+      "budget": 450000000
+    },
+    {
+      "db": "R. Racing Club",
+      "name": "R. Racing Club",
+      "abbr": "RAC",
+      "league": "ll",
+      "country": "Espanha",
+      "squad": "db",
+      "n_players": 26,
+      "ovr11": 74.73,
+      "ovr18": 72.78,
+      "rank": 55,
+      "budget": 475000000
+    },
+    {
+      "db": "Parma Calcio",
+      "name": "Parma Calcio",
+      "abbr": "PAR",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 27,
+      "ovr11": 74.45,
+      "ovr18": 72.72,
       "rank": 56,
-      "budget": 500000000
+      "budget": 475000000
     },
     {
       "db": "AC Monza",
@@ -911,9 +874,22 @@
       "country": "Itália",
       "squad": "db",
       "n_players": 31,
-      "ovr11": 74.1,
-      "ovr18": 72.6,
+      "ovr11": 74.09,
+      "ovr18": 72.56,
       "rank": 57,
+      "budget": 475000000
+    },
+    {
+      "db": "Frosinone Calcio",
+      "name": "Frosinone Calcio",
+      "abbr": "FRO",
+      "league": "sa",
+      "country": "Itália",
+      "squad": "db",
+      "n_players": 29,
+      "ovr11": 73.18,
+      "ovr18": 72.06,
+      "rank": 58,
       "budget": 500000000
     },
     {
@@ -924,9 +900,9 @@
       "country": "Espanha",
       "squad": "db",
       "n_players": 31,
-      "ovr11": 73.5,
+      "ovr11": 73.45,
       "ovr18": 72,
-      "rank": 58,
+      "rank": 59,
       "budget": 500000000
     },
     {
@@ -937,21 +913,8 @@
       "country": "Itália",
       "squad": "db",
       "n_players": 29,
-      "ovr11": 73.5,
-      "ovr18": 71.8,
-      "rank": 59,
-      "budget": 500000000
-    },
-    {
-      "db": "Frosinone Calcio",
-      "name": "Frosinone Calcio",
-      "abbr": "FRO",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 29,
-      "ovr11": 73.2,
-      "ovr18": 72.1,
+      "ovr11": 73.45,
+      "ovr18": 71.83,
       "rank": 60,
       "budget": 500000000
     }

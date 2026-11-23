@@ -17,19 +17,15 @@ Horários de Brasília. Etapa 1 publicada; o mata-mata europeu abaixo é o forma
 
 ## Verba inicial
 
-Faixas do ZC 50 (500 / 400 / 300 / 200 / 100 / 50 / 0 milhões de euros), pelo **ranking de over entre os 60** (maior over, menor verba). As faixas originais eram para 40 clubes (5+5+10+5+5+5+5); aqui foram escaladas 1,5× para somar 60, com 7 ou 8 nas pontas:
+Aprovada em 23/11/2026 (mesmo molde do Libertadores ZC 50, com o valor por ponto ajustado à faixa de over das 3 ligas):
 
-| Rank (1 = maior over) | Verba |
-|---|---|
-| 1–7 | € 0 |
-| 8–15 | € 50 mi |
-| 16–22 | € 100 mi |
-| 23–30 | € 200 mi |
-| 31–45 | € 300 mi |
-| 46–52 | € 400 mi |
-| 53–60 | € 500 mi |
+- O **over do time** é a média dos **18 jogadores de maior over** do elenco inicial. O desempate (ranking) é pela média dos 11 maiores.
+- O time de maior over (**Real Madrid, 85,17**) recebe **€ 0**.
+- Cada ponto de over abaixo dele vale **€ 37,5 mi**.
+- O valor é arredondado para múltiplos de **€ 25 mi**, com teto de **€ 500 mi**.
+- Fórmula: `min(500, round(37,5 × (85,17 − over) / 25) × 25)` milhões. Total da liga: **€ 17.500 mi**.
 
-Lista completa em `config/europa.json` (rank e `budget` de cada clube). Ex.: Barcelona, Real Madrid, Arsenal, Manchester City, Liverpool, Inter e Atlético começam com € 0; Frosinone, Lecce, Málaga e outros do fim da lista, com € 500 mi.
+Lista completa em `config/europa.json` (rank, `ovr18` e `budget` de cada clube). Exemplos: Arsenal, Barcelona e Manchester City € 25 mi; Liverpool € 75 mi; Atlético e Inter € 100 mi; Chelsea € 150 mi; Milan € 200 mi; Valencia € 325 mi; Hull € 400 mi; Frosinone, Málaga e Lecce € 500 mi.
 
 Premiação por posição **em cada liga nacional** (provisória, no molde do ZC 50): 1º € 100 mi, 2º 50, 3º 30, 4º–8º 20, 9º–10º 10, 11º–20º 0. Por jogo, em qualquer competição: vitória € 1 mi, empate € 0,3 mi. Títulos de copa e europeias ainda **sem prêmio extra** nesta etapa.
 
@@ -37,12 +33,12 @@ Premiação por posição **em cada liga nacional** (provisória, no molde do ZC
 
 Os 60 clubes são os da base FC27 de 15/10/2026, **sem** as migrações do Libertadores ZC 50 (jogadores não saem para o Leilão ZC nem para clubes CONMEBOL). Na tela, **Inter**, **Milan** e **Atalanta** no lugar de Lombardia FC, Milano FC e Bergamo Calcio. Escudos desta etapa são **placeholders** (sigla colorida); não foram inventados brasões oficiais.
 
-Qualificação da 1ª temporada (over dos 11):
+Qualificação da 1ª temporada (over dos 18, desempate pelos 11). Com essa regra, na Premier League o Crystal Palace entra na Champions no lugar do Sunderland; La Liga e Serie A não mudam:
 
-- **Champions**: Arsenal, Manchester City, Liverpool, Man Utd, Chelsea, Spurs, Aston Villa, Newcastle Utd, Nott'm Forest, Sunderland; FC Barcelona, Real Madrid, Atlético de Madrid, Athletic Bilbao, Villarreal CF, Real Betis, Real Sociedad, Rayo Vallecano, Celta, CA Osasuna; Inter, SSC Napoli, AS Roma, Milan, Juventus FC, Atalanta, Como 1907, SS Lazio, ACF Fiorentina, Bologna FC.
-- **Europa League**: Crystal Palace, Brentford, Everton, AFC Bournemouth, Brighton, Leeds United, Fulham, Ipswich Town, Hull City, Coventry City; Valencia CF, Sevilla FC, RC Deportivo, RCD Espanyol, Getafe CF, D. Alavés, Levante UD, R. Racing Club, Elche CF, Málaga CF; Torino FC, Sassuolo, Udinese Calcio, Genoa CFC, Venezia FC, Parma Calcio, Cagliari Calcio, AC Monza, US Lecce, Frosinone Calcio.
+- **Champions**: Arsenal, Manchester City, Liverpool, Man Utd, Chelsea, Spurs, Newcastle Utd, Aston Villa, Nott'm Forest, Crystal Palace; Real Madrid, FC Barcelona, Atlético de Madrid, Athletic Bilbao, Villarreal CF, Real Betis, Real Sociedad, Celta, Rayo Vallecano, CA Osasuna; Inter, SSC Napoli, Juventus FC, AS Roma, Milan, Atalanta, Como 1907, SS Lazio, Bologna FC, ACF Fiorentina.
+- **Europa League**: Brentford, Sunderland, AFC Bournemouth, Brighton, Everton, Leeds United, Fulham, Ipswich Town, Hull City, Coventry City; Valencia CF, RCD Espanyol, Sevilla FC, Getafe CF, RC Deportivo, D. Alavés, Levante UD, Elche CF, R. Racing Club, Málaga CF; Torino FC, Sassuolo, Udinese Calcio, Venezia FC, Genoa CFC, Cagliari Calcio, Parma Calcio, AC Monza, Frosinone Calcio, US Lecce.
 
-O corte 10º/11º da Premier é apertado (Sunderland 80,1 × Crystal Palace 80,0), mas não empata. Roma e Napoli empatam no over dos 11; o desempate dos 18 deixa o Napoli à frente — os dois entram na Champions.
+O corte 10º/11º da Premier (média dos 18) fica com Crystal Palace à frente do Sunderland. Na Serie A, Juventus fica à frente da Roma no over dos 18 — os dois entram na Champions.
 
 Não há acesso/rebaixamento com as segundas divisões nesta etapa.
 

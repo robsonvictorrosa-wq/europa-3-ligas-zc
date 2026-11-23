@@ -31,6 +31,9 @@ font3=ImageFont.truetype(FONT, 92)
 font2=ImageFont.truetype(FONT, 110)
 
 for cid, name, abbr, lk in rows:
+    dest=OUT/f"{cid}.png"
+    if dest.exists() and dest.stat().st_size>800:
+        continue  # preserva escudos oficiais já no repositório
     bg=color(name+"|"+str(cid))
     fg=(255,255,255) if lum(bg)<160 else (20,20,20)
     im=Image.new("RGBA",(SIZE,SIZE),(0,0,0,0))

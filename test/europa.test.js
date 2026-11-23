@@ -61,8 +61,8 @@ const root=path.join(__dirname,'..');
   const inter=ov.clubs.find(c=>c.name==='Inter');
   const chelsea=ov.clubs.find(c=>c.name==='Chelsea');
   assert.ok(inter&&chelsea);
-  assert.strictEqual(+inter.initial,0);
-  assert.strictEqual(+chelsea.initial,50e6);
+  assert.strictEqual(+inter.initial,100e6);
+  assert.strictEqual(+chelsea.initial,150e6);
 
   // admin atribui Inter ao Robshow
   const rooms=await ok('GET','/api/rooms/LIGA');
@@ -95,9 +95,7 @@ const root=path.join(__dirname,'..');
   const chel=await ok('GET','/api/clubs/'+chelsea.id);
   const alvo=(chel.players||[]).filter(p=>p.overall>=70).sort((a,b)=>a.overall-b.overall)[0];
   assert.ok(alvo,'Chelsea deveria ter jogadores');
-  // Inter budget is 0 — oferta deve falhar por verba. Usa um clube com verba: pega Hull/Frosinone para o Robshow? 
-  // Melhor: atribui temporariamente um clube rico... Inter tem 0. Troca Robshow para Parma (500mi)? Já testou assign Inter.
-  // Faz a oferta do Tesouro (Chelsea, 50mi) por um jogador do Inter — 50mi pode bastar para um reserva.
+  // Tesouro (Chelsea, €150 mi) oferece por um jogador do Inter.
   cookie.v='';
   await ok('POST','/api/auth/login',{nick:'Tesouro',pin:'1234'});
   const interC=await ok('GET','/api/clubs/'+inter.id);

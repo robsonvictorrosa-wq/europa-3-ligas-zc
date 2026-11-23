@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "build": "node import.js && python3 scripts/gen-crests.py",
-    "test": "node test/comps.test.js && node test/europa.test.js"
+    "test": "node test/comps.test.js && node test/budget.test.js && node test/europa.test.js"
   },
   "keywords": [],
   "author": "",

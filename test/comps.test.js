@@ -62,13 +62,28 @@ assert.strictEqual(CF.clubs.length,60);
 assert.ok(CF.clubs.find(c=>c.name==='Inter'&&c.db==='Lombardia FC'));
 assert.ok(CF.clubs.find(c=>c.name==='Milan'&&c.db==='Milano FC'));
 assert.ok(CF.clubs.find(c=>c.name==='Atalanta'&&c.db==='Bergamo Calcio'));
-const bar=CF.clubs.find(c=>c.name==='FC Barcelona');
-assert.strictEqual(bar.rank,1);assert.strictEqual(bar.budget,0);
+const rma=CF.clubs.find(c=>c.name==='Real Madrid');
+assert.strictEqual(rma.rank,1);assert.strictEqual(rma.budget,0);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Arsenal').budget,25e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='FC Barcelona').budget,25e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Manchester City').budget,25e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Liverpool').budget,75e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Atlético de Madrid').budget,100e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Inter').budget,100e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Chelsea').budget,150e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Milan').budget,200e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Valencia CF').budget,325e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Hull City').budget,400e6);
 const fro=CF.clubs.find(c=>c.name==='Frosinone Calcio');
-assert.strictEqual(fro.rank,60);assert.strictEqual(fro.budget,500e6);
+assert.strictEqual(fro.rank,58);assert.strictEqual(fro.budget,500e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Málaga CF').budget,500e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='US Lecce').rank,60);
+assert.strictEqual(CF.clubs.find(c=>c.name==='US Lecce').budget,500e6);
+assert.strictEqual(CF.clubs.reduce((s,c)=>s+c.budget,0),17500e6);
 assert.ok(CF.season1_europe.ucl.includes('Inter'));
-assert.ok(CF.season1_europe.el.includes('Crystal Palace'));
-assert.ok(!CF.season1_europe.ucl.includes('Crystal Palace'));
+assert.ok(CF.season1_europe.ucl.includes('Crystal Palace'));
+assert.ok(CF.season1_europe.el.includes('Sunderland'));
+assert.ok(!CF.season1_europe.ucl.includes('Sunderland'));
 
 function tableOf(ids){return ids.map((club_id,i)=>({club_id,pos:i+1}));}
 function leagueIds(prefix){return [...Array(20)].map((_,i)=>prefix*100+(i+1));} // 1=melhor
