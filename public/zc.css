@@ -267,7 +267,7 @@ html{background:#000}
 .cal-ha{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#D1D5DB}
 .cal-cp{font-size:9px;font-weight:700;letter-spacing:.08em;color:#C0C0C0}
 .cal-opp{display:flex;align-items:center;gap:3px;font-size:11px;color:#F3F4F6}
-.cal-opp .badge{width:16px;height:16px;font-size:8px}
+.cal-opp .badge,.cal-opp .badge.crest{width:22px;height:22px;font-size:8px;flex:0 0 22px}
 .cal-sc{font-size:11px;font-weight:700;color:#F3F4F6}
 .ck-league.cal-d,.cal-d.ck-league{box-shadow:inset 0 2px 0 #E5E7EB}
 .ck-ucl.cal-d,.cal-d.ck-ucl{box-shadow:inset 0 2px 0 #9DB4FF}
@@ -283,7 +283,6 @@ html{background:#000}
 .cal-li{padding:8px 0;border-bottom:1px solid #222;font-size:14px}
 @media(max-width:700px){
   .cal-d{min-height:70px;padding:3px 2px}
-  .cal-opp .badge{display:none}
   .csel-btn{flex-basis:40px;height:40px}
   .t-cal{grid-column:auto;grid-row:auto}
 }
