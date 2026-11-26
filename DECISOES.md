@@ -23,20 +23,20 @@ Aprovada em 23/11/2026 (mesmo molde do Libertadores ZC 50, com o valor por ponto
 - O time de maior over (**Real Madrid, 85,17**) recebe **€ 0**.
 - Cada ponto de over abaixo dele vale **€ 37,5 mi**.
 - O valor é arredondado para múltiplos de **€ 25 mi**, com teto de **€ 500 mi**.
-- Fórmula: `min(500, round(37,5 × (85,17 − over) / 25) × 25)` milhões. Total dos 54 clubes: **€ 14.725 mi**.
+- Fórmula: `min(500, round(37,5 × (85,17 − over) / 25) × 25)` milhões. Total dos 54 clubes: **€ 14.750 mi**.
 
-Lista completa em `config/europa.json` (rank, `ovr18` e `budget` de cada clube). Exemplos: Arsenal, Barcelona e Manchester City € 25 mi; Liverpool € 75 mi; Atlético e Inter € 100 mi; Chelsea € 150 mi; Milan € 200 mi; Valencia € 325 mi; Monza e Parma € 475 mi.
+Lista completa em `config/europa.json` (rank, `ovr18` e `budget` de cada clube). Exemplos: Arsenal, Barcelona e Manchester City € 25 mi; Liverpool € 75 mi; Atlético e Inter € 100 mi; Chelsea € 150 mi; Milan € 200 mi; Valencia € 325 mi; Parma € 475 mi; Frosinone € 500 mi.
 
 Premiação por posição **em cada liga nacional** (provisória, no molde do ZC 50): 1º € 100 mi, 2º 50, 3º 30, 4º–8º 20, 9º–10º 10, 11º–18º 0. Por jogo, em qualquer competição: vitória € 1 mi, empate € 0,3 mi. Títulos de copa e europeias ainda **sem prêmio extra** nesta etapa.
 
 ## Clubes e base
 
-Os **54 clubes ativos** vêm da base FC27 de 15/10/2026 (18 por liga), **sem** as migrações do Libertadores ZC 50. Em 26/11/2026 saíram os 2 de menor over de cada liga (média dos 18, desempate dos 11): **Hull City** (74,50) e **Coventry City** (74,50) na Premier; **R. Racing Club** (72,78) e **Málaga CF** (72,00) na La Liga; **Frosinone Calcio** (72,06) e **US Lecce** (71,83) na Serie A. Os jogadores desses 6 clubes continuam no FC27 e podem entrar no leilão pelo admin, mas os clubes não disputam as ligas. Na tela, **Inter**, **Milan** e **Atalanta** no lugar de Lombardia FC, Milano FC e Bergamo Calcio. Escudos oficiais dos 54 (e dos 6 que saíram) estão no site.
+Os **54 clubes ativos** vêm da base FC27 de 15/10/2026 (18 por liga), **sem** as migrações do Libertadores ZC 50. Em 26/11/2026 saíram os 2 de menor over de cada liga (média dos 18, desempate dos 11): **Hull City** (74,50) e **Coventry City** (74,50) na Premier; **R. Racing Club** (72,78) e **Málaga CF** (72,00) na La Liga; e, na Serie A, o **US Lecce** (71,83). O Robson pediu para **manter o Frosinone Calcio** (72,06); no lugar dele saiu o próximo de menor over, o **AC Monza** (72,56). Os jogadores desses 6 clubes continuam no FC27 e podem entrar no leilão pelo admin, mas os clubes não disputam as ligas. Na tela, **Inter**, **Milan** e **Atalanta** no lugar de Lombardia FC, Milano FC e Bergamo Calcio. Escudos oficiais dos 54 (e dos 6 que saíram) estão no site.
 
 Qualificação da 1ª temporada (over dos 18, desempate pelos 11). Corte 9º/10º: Premier League, Nott'm Forest (79,17) na Champions e Crystal Palace (78,89) na Europa League; La Liga, Rayo Vallecano (77,00) / CA Osasuna (76,61); Serie A, Bologna FC (76,00) / ACF Fiorentina (75,83).
 
 - **Champions**: Arsenal, Manchester City, Liverpool, Man Utd, Chelsea, Spurs, Newcastle Utd, Aston Villa, Nott'm Forest; Real Madrid, FC Barcelona, Atlético de Madrid, Athletic Bilbao, Villarreal CF, Real Betis, Real Sociedad, Celta, Rayo Vallecano; Inter, SSC Napoli, Juventus FC, AS Roma, Milan, Atalanta, Como 1907, SS Lazio, Bologna FC.
-- **Europa League**: Crystal Palace, Brentford, Sunderland, AFC Bournemouth, Brighton, Everton, Leeds United, Fulham, Ipswich Town; CA Osasuna, Valencia CF, RCD Espanyol, Sevilla FC, Getafe CF, RC Deportivo, D. Alavés, Levante UD, Elche CF; ACF Fiorentina, Torino FC, Sassuolo, Udinese Calcio, Venezia FC, Genoa CFC, Cagliari Calcio, Parma Calcio, AC Monza.
+- **Europa League**: Crystal Palace, Brentford, Sunderland, AFC Bournemouth, Brighton, Everton, Leeds United, Fulham, Ipswich Town; CA Osasuna, Valencia CF, RCD Espanyol, Sevilla FC, Getafe CF, RC Deportivo, D. Alavés, Levante UD, Elche CF; ACF Fiorentina, Torino FC, Sassuolo, Udinese Calcio, Venezia FC, Genoa CFC, Cagliari Calcio, Parma Calcio, Frosinone Calcio.
 
 Não há acesso/rebaixamento com as segundas divisões nesta etapa.
 

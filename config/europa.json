@@ -1,5 +1,5 @@
 {
-  "_doc": "Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. 54 clubes ativos (18 por liga; os 2 de menor over de cada liga saíram). Verba: €37,5 mi por ponto de over (média dos 18 maiores do elenco inicial; desempate pela média dos 11) abaixo do melhor (Real Madrid), arredondada a múltiplo de €25 mi, teto €500 mi.",
+  "_doc": "Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. 54 clubes ativos (18 por liga; saíram os 2 de menor over de cada liga, com a exceção do Frosinone na Serie A — no lugar dele saiu o AC Monza; o US Lecce continua fora). Verba: €37,5 mi por ponto de over (média dos 18 maiores do elenco inicial; desempate pela média dos 11) abaixo do melhor (Real Madrid), arredondada a múltiplo de €25 mi, teto €500 mi.",
   "name": "Europa 3 Ligas ZC",
   "default_budget": 20000000,
   "default_wage_budget": 400000,
@@ -70,7 +70,7 @@
     }
   ],
   "_doc_prizes": "Premiação por posição em cada liga nacional (provisória, no molde do ZC 50). Copas e europeias ainda sem prêmio de título nesta etapa.",
-  "_doc_budget": "Verba inicial (Robson 23/11/2026): over = média dos 18 maiores overs do elenco inicial (desempate: média dos 11). Real Madrid (85,17) recebe €0. Cada ponto abaixo vale €37,5 mi, arredondado a múltiplo de €25 mi, teto €500 mi. Total da liga €17.500 mi.",
+  "_doc_budget": "Verba inicial (Robson 23/11/2026): over = média dos 18 maiores overs do elenco inicial (desempate: média dos 11). Real Madrid (85,17) recebe €0. Cada ponto abaixo vale €37,5 mi, arredondado a múltiplo de €25 mi, teto €500 mi. Total dos 54 clubes após o ajuste do Frosinone: ver o valor impresso ao gerar o arquivo.",
   "season1_europe": {
     "ucl": [
       "Arsenal",
@@ -128,7 +128,7 @@
       "Genoa CFC",
       "Cagliari Calcio",
       "Parma Calcio",
-      "AC Monza"
+      "Frosinone Calcio"
     ]
   },
   "removed_clubs": [
@@ -161,18 +161,18 @@
       "ovr11": 73.45
     },
     {
-      "db": "Frosinone Calcio",
-      "name": "Frosinone Calcio",
-      "league": "sa",
-      "ovr18": 72.06,
-      "ovr11": 73.18
-    },
-    {
       "db": "US Lecce",
       "name": "US Lecce",
       "league": "sa",
       "ovr18": 71.83,
       "ovr11": 73.45
+    },
+    {
+      "db": "AC Monza",
+      "name": "AC Monza",
+      "league": "sa",
+      "ovr18": 72.56,
+      "ovr11": 74.09
     }
   ],
   "clubs": [
@@ -866,17 +866,17 @@
       "budget": 475000000
     },
     {
-      "db": "AC Monza",
-      "name": "AC Monza",
-      "abbr": "MON",
+      "db": "Frosinone Calcio",
+      "name": "Frosinone Calcio",
+      "abbr": "FRO",
       "league": "sa",
       "country": "Itália",
       "squad": "db",
-      "n_players": 31,
-      "ovr11": 74.09,
-      "ovr18": 72.56,
+      "n_players": 29,
+      "ovr11": 73.18,
+      "ovr18": 72.06,
       "rank": 54,
-      "budget": 475000000
+      "budget": 500000000
     }
   ]
 }

@@ -69,7 +69,7 @@ assert.strictEqual(CF.clubs.length,54);
 assert.ok(CF.clubs.find(c=>c.name==='Inter'&&c.db==='Lombardia FC'));
 assert.ok(CF.clubs.find(c=>c.name==='Milan'&&c.db==='Milano FC'));
 assert.ok(CF.clubs.find(c=>c.name==='Atalanta'&&c.db==='Bergamo Calcio'));
-for(const n of ['Hull City','Coventry City','R. Racing Club','Málaga CF','Frosinone Calcio','US Lecce']){
+for(const n of ['Hull City','Coventry City','R. Racing Club','Málaga CF','US Lecce','AC Monza']){
   assert.ok(!CF.clubs.find(c=>c.name===n),n+' deveria ter saído');
   assert.ok((CF.removed_clubs||[]).some(c=>c.name===n),n+' registrado em removed_clubs');
 }
@@ -85,8 +85,9 @@ assert.strictEqual(CF.clubs.find(c=>c.name==='Inter').budget,100e6);
 assert.strictEqual(CF.clubs.find(c=>c.name==='Chelsea').budget,150e6);
 assert.strictEqual(CF.clubs.find(c=>c.name==='Milan').budget,200e6);
 assert.strictEqual(CF.clubs.find(c=>c.name==='Valencia CF').budget,325e6);
-assert.strictEqual(CF.clubs.find(c=>c.name==='AC Monza').budget,475e6);
-assert.strictEqual(CF.clubs.reduce((s,c)=>s+c.budget,0),14725e6);
+assert.strictEqual(CF.clubs.find(c=>c.name==='Frosinone Calcio').budget,500e6);
+assert.ok(!CF.clubs.find(c=>c.name==='AC Monza'));
+assert.strictEqual(CF.clubs.reduce((s,c)=>s+c.budget,0),14750e6);
 assert.strictEqual(CF.season1_europe.ucl.length,27);
 assert.strictEqual(CF.season1_europe.el.length,27);
 assert.ok(CF.season1_europe.ucl.includes('Inter'));
