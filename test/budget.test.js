@@ -35,9 +35,10 @@ assert.strictEqual(computed['Inter'],100e6);
 assert.strictEqual(computed['Chelsea'],150e6);
 assert.strictEqual(computed['Milan'],200e6);
 assert.strictEqual(computed['Valencia CF'],325e6);
-assert.strictEqual(computed['Hull City'],400e6);
-assert.strictEqual(computed['Frosinone Calcio'],500e6);
-assert.strictEqual(computed['Málaga CF'],500e6);
-assert.strictEqual(computed['US Lecce'],500e6);
-assert.strictEqual(Object.values(computed).reduce((s,v)=>s+v,0),17500e6);
-console.log('budget.test.js ok', CF.clubs.length,'clubes, total €'+(17500)+' mi');
+assert.strictEqual(computed['AC Monza'],475e6);
+assert.strictEqual(CF.clubs.length,54);
+assert.strictEqual(Object.values(computed).reduce((s,v)=>s+v,0),14725e6);
+for(const n of ['Hull City','Coventry City','R. Racing Club','Málaga CF','Frosinone Calcio','US Lecce']){
+  assert.ok(!computed[n], n+' não entra na verba dos 54');
+}
+console.log('budget.test.js ok', CF.clubs.length,'clubes, total €'+(14725)+' mi');

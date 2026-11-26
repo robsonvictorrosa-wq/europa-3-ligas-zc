@@ -53,11 +53,13 @@ const root=path.join(__dirname,'..');
   assert.ok(me.user.admin||me.user.nick==='Robshow','Robshow deve ser admin');
 
   const ov=await ok('GET','/api/rooms/LIGA/zc/overview');
-  assert.strictEqual(ov.fmt.n_clubs,60);
-  assert.strictEqual(ov.fmt.league_rounds,38);
-  assert.strictEqual(ov.clubs.length,60);
+  assert.strictEqual(ov.fmt.n_clubs,54);
+  assert.strictEqual(ov.fmt.league_rounds,34);
+  assert.strictEqual(ov.clubs.length,54);
   assert.ok(ov.clubs.find(c=>c.name==='Inter'));
   assert.ok(!ov.clubs.find(c=>c.name==='Lombardia FC'));
+  assert.ok(!ov.clubs.find(c=>c.name==='US Lecce'));
+  assert.ok(!ov.clubs.find(c=>c.name==='Hull City'));
   const inter=ov.clubs.find(c=>c.name==='Inter');
   const chelsea=ov.clubs.find(c=>c.name==='Chelsea');
   assert.ok(inter&&chelsea);
@@ -112,7 +114,7 @@ const root=path.join(__dirname,'..');
 
   // calendário e início da temporada
   const prev=await ok('GET','/api/rooms/LIGA/zc/admin/season/preview?start=2027-07-01');
-  assert.strictEqual(prev.total_matchdays,65);
+  assert.strictEqual(prev.total_matchdays,62);
   await ok('POST','/api/rooms/LIGA/zc/admin/season/agenda',{start:'2027-07-01',auto:false});
   await ok('POST','/api/rooms/LIGA/season/start',{confirm:true});
   const season=await ok('GET','/api/rooms/LIGA/season');
@@ -122,15 +124,15 @@ const root=path.join(__dirname,'..');
   assert.ok(season.competitions.find(c=>c.kind==='ucl'&&c.name==='Champions League'));
 
   const fx=await ok('GET','/api/rooms/LIGA/zc/fixtures');
-  assert.strictEqual(fx.total,65);
-  assert.ok(fx.rounds[0].games.length>=20); // 3 ligas, 10 jogos cada = 30; preview may include only leagues on md1
+  assert.strictEqual(fx.total,62);
+  assert.ok(fx.rounds[0].games.length>=18); // 3 ligas, 9 jogos cada = 27
 
   // simular jornada 1 (3 ligas)
   const a1=await ok('POST','/api/rooms/LIGA/advance');
   assert.ok(a1.ok);
   const pl=season.competitions.find(c=>c.kind==='league'&&c.league_key==='pl');
   const tb1=await ok('GET',`/api/rooms/LIGA/comp/${pl.id}/table`);
-  assert.strictEqual(tb1.rows.length,20);
+  assert.strictEqual(tb1.rows.length,18);
   assert.ok(tb1.rows.some(x=>x.j===1));
 
   // avançar até a jornada 3 (1ª da fase de liga europeia): md2 liga, md3 europe
@@ -138,13 +140,13 @@ const root=path.join(__dirname,'..');
   const a3=await ok('POST','/api/rooms/LIGA/advance');
   const ucl=season.competitions.find(c=>c.kind==='ucl');
   const ut=await ok('GET',`/api/rooms/LIGA/comp/${ucl.id}/table`);
-  assert.strictEqual(ut.rows.length,30,'Champions deve ter 30 times');
+  assert.strictEqual(ut.rows.length,27,'Champions deve ter 27 times');
   assert.ok(ut.rows.some(x=>x.name==='Inter'),'Inter na Champions (s1 por over)');
   assert.ok(!ut.rows.some(x=>x.name==='Crystal Palace'),'Palace não entra na Champions na 1ª temporada');
 
   const el=season.competitions.find(c=>c.kind==='el');
   const et=await ok('GET',`/api/rooms/LIGA/comp/${el.id}/table`);
-  assert.strictEqual(et.rows.length,30);
+  assert.strictEqual(et.rows.length,27);
   assert.ok(et.rows.some(x=>x.name==='Crystal Palace'));
 
   // avançar até a 1ª jornada de copa (md 25 no plano: depois de 16 ligas + 8 europe = 24, depois prelim 1)
@@ -159,7 +161,7 @@ const root=path.join(__dirname,'..');
   assert.ok(br.stages.find(s=>s.key==='prelim'),'FA Cup deve ter preliminar');
 
   // simular o resto da temporada (pode levar uns minutos)
-  console.log('simulando o restante das 65 jornadas…');
+  console.log('simulando o restante das 62 jornadas…');
   let st=await ok('GET','/api/rooms/LIGA/season');
   let guard=0;
   while(st.status==='season'&&guard<80){
@@ -168,7 +170,7 @@ const root=path.join(__dirname,'..');
     if(r.matchday%10===0||r.results?.some(x=>x.info))console.log('  jornada',r.matchday, (r.results||[]).filter(x=>x.info).map(x=>x.info).join(' | '));
     st=await ok('GET','/api/rooms/LIGA/season');
   }
-  assert.strictEqual(st.status,'finished','temporada deveria terminar após 65 jornadas');
+  assert.strictEqual(st.status,'finished','temporada deveria terminar após 62 jornadas');
   const cupsDone=st.competitions.filter(c=>c.kind==='cup');
   assert.ok(cupsDone.every(c=>c.champion),'todas as copas com campeão');
   assert.ok(st.competitions.find(c=>c.kind==='ucl').champion,'Champions com campeão');
@@ -178,8 +180,8 @@ const root=path.join(__dirname,'..');
   for(const lg of ['pl','ll','sa']){
     const c=st.competitions.find(x=>x.kind==='league'&&x.league_key===lg);
     tables[lg]=(await ok('GET',`/api/rooms/LIGA/comp/${c.id}/table`)).rows;
-    assert.strictEqual(tables[lg].length,20);
-    assert.ok(tables[lg].every(x=>x.j===38),lg+' deveria ter 38 jogos');
+    assert.strictEqual(tables[lg].length,18);
+    assert.ok(tables[lg].every(x=>x.j===34),lg+' deveria ter 34 jogos');
   }
   const uclWinner=st.competitions.find(c=>c.kind==='ucl').champion;
   const cupWinners=Object.fromEntries(st.competitions.filter(c=>c.kind==='cup').map(c=>[c.league_key,c.champion]));
@@ -195,8 +197,8 @@ const root=path.join(__dirname,'..');
   const el2=s2.competitions.find(c=>c.kind==='el');
   const ut2=await ok('GET',`/api/rooms/LIGA/comp/${ucl2.id}/table`);
   const et2=await ok('GET',`/api/rooms/LIGA/comp/${el2.id}/table`);
-  assert.strictEqual(ut2.rows.length,30,'s2 Champions 30 times');
-  assert.strictEqual(et2.rows.length,30,'s2 Europa League 30 times');
+  assert.strictEqual(ut2.rows.length,27,'s2 Champions 27 times');
+  assert.strictEqual(et2.rows.length,27,'s2 Europa League 27 times');
   const s2ids=new Set(ut2.rows.map(x=>x.club_id));
   const s2el=new Set(et2.rows.map(x=>x.club_id));
   assert.ok(s2ids.has(uclWinner),'campeão da Champions tem vaga na Champions seguinte');
@@ -205,29 +207,29 @@ const root=path.join(__dirname,'..');
   }
   for(const lg of ['pl','ll','sa']){
     const rows=tables[lg];
-    const top10=rows.filter(x=>x.pos<=10).map(x=>x.club_id);
-    const tenth=rows.find(x=>x.pos===10).club_id;
+    const top9=rows.filter(x=>x.pos<=9).map(x=>x.club_id);
     const ninth=rows.find(x=>x.pos===9).club_id;
+    const eighth=rows.find(x=>x.pos===8).club_id;
     const cup=cupWinners[lg];
     const cupPos=rows.find(x=>x.club_id===cup)?.pos;
     const uclPos=rows.find(x=>x.club_id===uclWinner)?.pos;
-    const outside=[cup,uclWinner].filter((id,i,a)=>id&&a.indexOf(id)===i&&rows.some(x=>x.club_id===id&&x.pos>10));
-    for(const id of top10){
+    const outside=[cup,uclWinner].filter((id,i,a)=>id&&a.indexOf(id)===i&&rows.some(x=>x.club_id===id&&x.pos>9));
+    for(const id of top9){
       const isGuaranteed=id===cup||id===uclWinner;
-      const evicted=(outside.length>=1&&id===tenth&&!isGuaranteed)||(outside.length>=2&&id===ninth&&!isGuaranteed);
+      const evicted=(outside.length>=1&&id===ninth&&!isGuaranteed)||(outside.length>=2&&id===eighth&&!isGuaranteed);
       if(evicted){
-        assert.ok(!s2ids.has(id),'lugar cedido ('+lg+' pos '+(id===tenth?10:9)+') fora da Champions');
+        assert.ok(!s2ids.has(id),'lugar cedido ('+lg+' pos '+(id===ninth?9:8)+') fora da Champions');
         assert.ok(s2el.has(id),'lugar cedido foi para a Europa League');
       }else{
-        assert.ok(s2ids.has(id),'top 10 da '+lg+' permanece na Champions (ou é campeão): '+id);
+        assert.ok(s2ids.has(id),'top 9 da '+lg+' permanece na Champions (ou é campeão): '+id);
       }
     }
     const inUcl=rows.filter(x=>s2ids.has(x.club_id));
     const inEl=rows.filter(x=>s2el.has(x.club_id));
-    assert.strictEqual(inUcl.length,10,lg+' com 10 na Champions');
-    assert.strictEqual(inEl.length,10,lg+' com 10 na Europa League');
-    if(cupPos>10)console.log('  caso copa fora do top 10:',lg,'campeão pos',cupPos,'10º saiu?',!s2ids.has(tenth));
-    if(uclPos>10)console.log('  caso Champions fora do top 10: liga',lg,'pos',uclPos);
+    assert.strictEqual(inUcl.length,9,lg+' com 9 na Champions');
+    assert.strictEqual(inEl.length,9,lg+' com 9 na Europa League');
+    if(cupPos>9)console.log('  caso copa fora do top 9:',lg,'campeão pos',cupPos,'9º saiu?',!s2ids.has(ninth));
+    if(uclPos>9)console.log('  caso Champions fora do top 9: liga',lg,'pos',uclPos);
   }
 
   console.log('europa.test.js OK');

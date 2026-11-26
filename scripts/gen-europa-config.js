@@ -49,42 +49,53 @@ for(const lg of LEAGUES){
     });
   }
 }
+
+// Remove os 2 de menor over de cada liga (Robson 26/11/2026). Jogadores seguem no FC27 para o leilão.
+const removed=[];
+const kept=[];
+for(const lg of LEAGUES){
+  const list=clubs.filter(c=>c.league===lg.key).sort((a,b)=>b.ovr18_raw-a.ovr18_raw||b.ovr11_raw-a.ovr11_raw||a.name.localeCompare(b.name,'pt'));
+  if(list.length!==20)throw new Error(lg.key+' deveria ter 20 antes do corte');
+  kept.push(...list.slice(0,18));
+  for(const c of list.slice(18))removed.push({db:c.db,name:c.name,league:lg.key,ovr18:r2(c.ovr18_raw),ovr11:r2(c.ovr11_raw)});
+}
+clubs.length=0;clubs.push(...kept);
 clubs.sort((a,b)=>b.ovr18_raw-a.ovr18_raw||b.ovr11_raw-a.ovr11_raw||a.name.localeCompare(b.name,'pt'));
 const top=clubs[0].ovr18_raw;
 clubs.forEach((c,i)=>{c.rank=i+1;c.ovr11=r2(c.ovr11_raw);c.ovr18=r2(c.ovr18_raw);c.budget=budgetOf(c.ovr18_raw,top);delete c.ovr11_raw;delete c.ovr18_raw;});
 
-// Qualificação s1: 10 melhores de cada liga pelo over (média dos 18, desempate dos 11) na Champions, 10 piores na EL
+// Qualificação s1: 9 melhores de cada liga pelo over (média dos 18, desempate dos 11) na Champions, 9 piores na EL
 const europe={ucl:[],el:[]};
 for(const lg of LEAGUES){
-  const list=clubs.filter(c=>c.league===lg.key).sort((a,b)=>a.rank-b.rank); // already global rank, but need league order by ovr
-  list.sort((a,b)=>clubs.indexOf(a)-clubs.indexOf(b));
   const byOvr=clubs.filter(c=>c.league===lg.key).slice().sort((a,b)=>a.rank-b.rank);
-  europe.ucl.push(...byOvr.slice(0,10).map(c=>c.name));
-  europe.el.push(...byOvr.slice(10).map(c=>c.name));
+  if(byOvr.length!==18)throw new Error(lg.key+' deveria ficar com 18');
+  europe.ucl.push(...byOvr.slice(0,9).map(c=>c.name));
+  europe.el.push(...byOvr.slice(9).map(c=>c.name));
 }
 
 const out={
-  _doc:'Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. Verba: €37,5 mi por ponto de over (média dos 18 maiores do elenco inicial; desempate pela média dos 11) abaixo do melhor (Real Madrid), arredondada a múltiplo de €25 mi, teto €500 mi.',
+  _doc:'Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. 54 clubes ativos (18 por liga; os 2 de menor over de cada liga saíram). Verba: €37,5 mi por ponto de over (média dos 18 maiores do elenco inicial; desempate pela média dos 11) abaixo do melhor (Real Madrid), arredondada a múltiplo de €25 mi, teto €500 mi.',
   name:'Europa 3 Ligas ZC',
   default_budget:20e6,
   default_wage_budget:400000,
   placeholder_ovr:68,
   meta_onze:6,
   auction:{min_bid_pct:0.5},
-  mid_matchday:29, // após a 19ª rodada das ligas nacionais (ver comps.js)
+  mid_matchday:28, // após a 17ª rodada das ligas e a 9ª jornada da fase de liga europeia (ver comps.js)
   display_names:DISPLAY,
   leagues:LEAGUES,
   prizes:[
     {from:1,to:1,amount:100e6},{from:2,to:2,amount:50e6},{from:3,to:3,amount:30e6},
-    {from:4,to:8,amount:20e6},{from:9,to:10,amount:10e6},{from:11,to:20,amount:0}
+    {from:4,to:8,amount:20e6},{from:9,to:10,amount:10e6},{from:11,to:18,amount:0}
   ],
   _doc_prizes:'Premiação por posição em cada liga nacional (provisória, no molde do ZC 50). Copas e europeias ainda sem prêmio de título nesta etapa.',
   _doc_budget:'Verba inicial (Robson 23/11/2026): over = média dos 18 maiores overs do elenco inicial (desempate: média dos 11). Real Madrid (85,17) recebe €0. Cada ponto abaixo vale €37,5 mi, arredondado a múltiplo de €25 mi, teto €500 mi. Total da liga €17.500 mi.',
   season1_europe:europe,
+  removed_clubs:removed,
   clubs
 };
 fs.writeFileSync(path.join(ROOT,'config/europa.json'), JSON.stringify(out,null,2));
-console.log('clubs',clubs.length);
+console.log('clubs',clubs.length,'removed',removed.map(c=>c.name).join(', '));
 console.log('UCL',europe.ucl.join(', '));
 console.log('EL',europe.el.join(', '));
 for(const c of clubs){

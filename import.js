@@ -1,4 +1,4 @@
-// Importa data/fc27.json.gz -> data/game.db (universo limpo) e aplica os 60 clubes do Europa 3 Ligas ZC.
+// Importa data/fc27.json.gz -> data/game.db (universo limpo) e aplica os 54 clubes do Europa 3 Ligas ZC.
 const fs=require('fs'),D=require('better-sqlite3'),path=require('path');
 const src=JSON.parse(require('zlib').gunzipSync(fs.readFileSync(__dirname+'/data/fc27.json.gz')).toString('utf8'));
 if(fs.existsSync(__dirname+'/data/game.db'))fs.unlinkSync(__dirname+'/data/game.db');
@@ -29,7 +29,7 @@ db.exec(`UPDATE clubs SET n_players=(SELECT count(*) FROM players WHERE club_id=
  budget=(SELECT coalesce(sum(market_value),0)/8 FROM players WHERE club_id=clubs.id)`);
 console.log(db.prepare('select count(*) n from players').get(),db.prepare('select count(*) n from clubs').get(),db.prepare('select count(*) n from leagues').get());
 
-// ===== Europa 3 Ligas ZC: 60 clubes do FC27 limpo (sem migrações do ZC 50) =====
+// ===== Europa 3 Ligas ZC: 54 clubes do FC27 limpo (sem migrações do ZC 50) =====
 const CF=JSON.parse(fs.readFileSync(__dirname+'/config/europa.json','utf8'));
 db.exec(`CREATE TABLE lib_clubs(
   ord INT, club_id INT, name TEXT, fc27_name TEXT, country TEXT, league_key TEXT,

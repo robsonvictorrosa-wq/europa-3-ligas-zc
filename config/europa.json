@@ -1,5 +1,5 @@
 {
-  "_doc": "Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. Verba: €37,5 mi por ponto de over (média dos 18 maiores do elenco inicial; desempate pela média dos 11) abaixo do melhor (Real Madrid), arredondada a múltiplo de €25 mi, teto €500 mi.",
+  "_doc": "Configuração do Europa 3 Ligas ZC. Elencos do FC27 limpo (data/fc27.json.gz). Nomes de exibição: Inter, Milan e Atalanta no lugar dos nomes licenciados da EA. 54 clubes ativos (18 por liga; os 2 de menor over de cada liga saíram). Verba: €37,5 mi por ponto de over (média dos 18 maiores do elenco inicial; desempate pela média dos 11) abaixo do melhor (Real Madrid), arredondada a múltiplo de €25 mi, teto €500 mi.",
   "name": "Europa 3 Ligas ZC",
   "default_budget": 20000000,
   "default_wage_budget": 400000,
@@ -8,7 +8,7 @@
   "auction": {
     "min_bid_pct": 0.5
   },
-  "mid_matchday": 29,
+  "mid_matchday": 28,
   "display_names": {
     "Lombardia FC": "Inter",
     "Milano FC": "Milan",
@@ -65,7 +65,7 @@
     },
     {
       "from": 11,
-      "to": 20,
+      "to": 18,
       "amount": 0
     }
   ],
@@ -82,7 +82,6 @@
       "Newcastle Utd",
       "Aston Villa",
       "Nott'm Forest",
-      "Crystal Palace",
       "Real Madrid",
       "FC Barcelona",
       "Atlético de Madrid",
@@ -92,7 +91,6 @@
       "Real Sociedad",
       "Celta",
       "Rayo Vallecano",
-      "CA Osasuna",
       "Inter",
       "SSC Napoli",
       "Juventus FC",
@@ -101,10 +99,10 @@
       "Atalanta",
       "Como 1907",
       "SS Lazio",
-      "Bologna FC",
-      "ACF Fiorentina"
+      "Bologna FC"
     ],
     "el": [
+      "Crystal Palace",
       "Brentford",
       "Sunderland",
       "AFC Bournemouth",
@@ -113,8 +111,7 @@
       "Leeds United",
       "Fulham",
       "Ipswich Town",
-      "Hull City",
-      "Coventry City",
+      "CA Osasuna",
       "Valencia CF",
       "RCD Espanyol",
       "Sevilla FC",
@@ -123,8 +120,7 @@
       "D. Alavés",
       "Levante UD",
       "Elche CF",
-      "R. Racing Club",
-      "Málaga CF",
+      "ACF Fiorentina",
       "Torino FC",
       "Sassuolo",
       "Udinese Calcio",
@@ -132,11 +128,53 @@
       "Genoa CFC",
       "Cagliari Calcio",
       "Parma Calcio",
-      "AC Monza",
-      "Frosinone Calcio",
-      "US Lecce"
+      "AC Monza"
     ]
   },
+  "removed_clubs": [
+    {
+      "db": "Hull City",
+      "name": "Hull City",
+      "league": "pl",
+      "ovr18": 74.5,
+      "ovr11": 75.45
+    },
+    {
+      "db": "Coventry City",
+      "name": "Coventry City",
+      "league": "pl",
+      "ovr18": 74.5,
+      "ovr11": 75.18
+    },
+    {
+      "db": "R. Racing Club",
+      "name": "R. Racing Club",
+      "league": "ll",
+      "ovr18": 72.78,
+      "ovr11": 74.73
+    },
+    {
+      "db": "Málaga CF",
+      "name": "Málaga CF",
+      "league": "ll",
+      "ovr18": 72,
+      "ovr11": 73.45
+    },
+    {
+      "db": "Frosinone Calcio",
+      "name": "Frosinone Calcio",
+      "league": "sa",
+      "ovr18": 72.06,
+      "ovr11": 73.18
+    },
+    {
+      "db": "US Lecce",
+      "name": "US Lecce",
+      "league": "sa",
+      "ovr18": 71.83,
+      "ovr11": 73.45
+    }
+  ],
   "clubs": [
     {
       "db": "Real Madrid",
@@ -724,32 +762,6 @@
       "budget": 400000000
     },
     {
-      "db": "Hull City",
-      "name": "Hull City",
-      "abbr": "HUL",
-      "league": "pl",
-      "country": "Inglaterra",
-      "squad": "db",
-      "n_players": 33,
-      "ovr11": 75.45,
-      "ovr18": 74.5,
-      "rank": 46,
-      "budget": 400000000
-    },
-    {
-      "db": "Coventry City",
-      "name": "Coventry City",
-      "abbr": "COV",
-      "league": "pl",
-      "country": "Inglaterra",
-      "squad": "db",
-      "n_players": 30,
-      "ovr11": 75.18,
-      "ovr18": 74.5,
-      "rank": 47,
-      "budget": 400000000
-    },
-    {
       "db": "D. Alavés",
       "name": "D. Alavés",
       "abbr": "ALA",
@@ -759,7 +771,7 @@
       "n_players": 27,
       "ovr11": 75.73,
       "ovr18": 74.11,
-      "rank": 48,
+      "rank": 46,
       "budget": 425000000
     },
     {
@@ -772,7 +784,7 @@
       "n_players": 28,
       "ovr11": 75.45,
       "ovr18": 74,
-      "rank": 49,
+      "rank": 47,
       "budget": 425000000
     },
     {
@@ -785,7 +797,7 @@
       "n_players": 35,
       "ovr11": 74.82,
       "ovr18": 73.61,
-      "rank": 50,
+      "rank": 48,
       "budget": 425000000
     },
     {
@@ -798,7 +810,7 @@
       "n_players": 26,
       "ovr11": 75.27,
       "ovr18": 73.39,
-      "rank": 51,
+      "rank": 49,
       "budget": 450000000
     },
     {
@@ -811,7 +823,7 @@
       "n_players": 29,
       "ovr11": 75,
       "ovr18": 73.33,
-      "rank": 52,
+      "rank": 50,
       "budget": 450000000
     },
     {
@@ -824,7 +836,7 @@
       "n_players": 31,
       "ovr11": 74.36,
       "ovr18": 73.06,
-      "rank": 53,
+      "rank": 51,
       "budget": 450000000
     },
     {
@@ -837,21 +849,8 @@
       "n_players": 31,
       "ovr11": 74.27,
       "ovr18": 72.94,
-      "rank": 54,
+      "rank": 52,
       "budget": 450000000
-    },
-    {
-      "db": "R. Racing Club",
-      "name": "R. Racing Club",
-      "abbr": "RAC",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 26,
-      "ovr11": 74.73,
-      "ovr18": 72.78,
-      "rank": 55,
-      "budget": 475000000
     },
     {
       "db": "Parma Calcio",
@@ -863,7 +862,7 @@
       "n_players": 27,
       "ovr11": 74.45,
       "ovr18": 72.72,
-      "rank": 56,
+      "rank": 53,
       "budget": 475000000
     },
     {
@@ -876,47 +875,8 @@
       "n_players": 31,
       "ovr11": 74.09,
       "ovr18": 72.56,
-      "rank": 57,
+      "rank": 54,
       "budget": 475000000
-    },
-    {
-      "db": "Frosinone Calcio",
-      "name": "Frosinone Calcio",
-      "abbr": "FRO",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 29,
-      "ovr11": 73.18,
-      "ovr18": 72.06,
-      "rank": 58,
-      "budget": 500000000
-    },
-    {
-      "db": "Málaga CF",
-      "name": "Málaga CF",
-      "abbr": "MAL",
-      "league": "ll",
-      "country": "Espanha",
-      "squad": "db",
-      "n_players": 31,
-      "ovr11": 73.45,
-      "ovr18": 72,
-      "rank": 59,
-      "budget": 500000000
-    },
-    {
-      "db": "US Lecce",
-      "name": "US Lecce",
-      "abbr": "LEC",
-      "league": "sa",
-      "country": "Itália",
-      "squad": "db",
-      "n_players": 29,
-      "ovr11": 73.45,
-      "ovr18": 71.83,
-      "rank": 60,
-      "budget": 500000000
     }
   ]
 }

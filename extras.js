@@ -24,7 +24,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
    for(const m of MP.rows){const [h,a]=m.hg>m.ag?[1e6,0]:m.hg<m.ag?[0,1e6]:[3e5,3e5];if(h)pay.set(m.home,(pay.get(m.home)||0)+h);if(a)pay.set(m.away,(pay.get(m.away)||0)+a);}
    for(const [cid,v] of pay)await c.query('UPDATE room_clubs SET budget=budget+$3 WHERE room_id=$1 AND club_id=$2',[room.id,cid,v]);
    if(MP.rows.length)await note(c,room.id,`💰 Premiação por jogo da jornada ${round}: vitória € 1 mi, empate € 0,3 mi (${pay.size} clubes premiados).`);}
-  // fim de cada liga nacional (38 rodadas jogadas): premiação por posição (config/europa.json prizes)
+  // fim de cada liga nacional (34 rodadas jogadas): premiação por posição (config/europa.json prizes)
   {const LS=(await c.query("SELECT * FROM competitions WHERE room_id=$1 AND season=$2 AND kind='league' AND NOT prizes_paid",[room.id,room.season])).rows;
    const pen=new Map((await c.query('SELECT club_id,penalty_pts FROM room_clubs WHERE room_id=$1 AND penalty_pts<>0',[room.id])).rows.map(x=>[x.club_id,x.penalty_pts]));
    for(const lc of LS){const ms=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND stage='league'",[lc.id])).rows;
@@ -35,7 +35,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
     await c.query('UPDATE competitions SET prizes_paid=true,champion=$2 WHERE id=$1',[lc.id,tb[0].club_id]);
     await note(c,room.id,`🏆 ${tb[0].name} é campeão da ${lc.name}! 💰 Premiações pagas (1º € ${(prizeOf(1)/1e6)} mi).`);
     out.push({info:`🏆 ${tb[0].name} campeão da ${lc.name}.`});}}
-  // janela do meio: depois da jornada MID_ROUND (liga nacional R19), só se a agenda não tiver datas de mercado do meio
+  // janela do meio: depois da jornada MID_ROUND (liga nacional R17 + 9ª jornada europeia), só se a agenda não tiver datas de mercado do meio
   if(round===MID_ROUND&&!((AG.windows||{}).mid||{}).market_open){await c.query("UPDATE rooms SET mkt_stage='mid',mkt_state='waiting',auction_open=false WHERE id=$1",[room.id]);await note(c,room.id,`🔨 Jornada ${MID_ROUND} concluída (fim do 1º turno das ligas): jogos parados até o leilão do meio e o mercado de 3 dias.`);out.push({info:'🔨 Leilão do meio pendente.'});}
   // janela do fim: depois da última jornada
   if(round===C.TOTAL_MD){await c.query("UPDATE rooms SET mkt_stage='end',mkt_state='waiting',auction_open=false WHERE id=$1",[room.id]);await note(c,room.id,'🔨 Temporada encerrada: leilão de fim de temporada e mercado de 24 h.');out.push({info:'🔨 Leilão de fim de temporada pendente.'});}
@@ -51,7 +51,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
   const me=mans.find(m=>m.user_id===r.user.id);let win=null;try{win=M.windowOf(room,await M.mainComp(pool,room));}catch(e){}
   // comps da temporada
   const comps=await q('SELECT * FROM competitions WHERE room_id=$1 AND season=$2 ORDER BY id',[room.id,room.season]);
-  s.json({comps,room:{code:room.code,name:room.name,status:room.status,season:room.season,market_day:room.market_day,current_matchday:room.current_matchday||0},admin:room.owner_id===r.user.id||!!r.user.admin,me:{nick:r.user.nick,club_id:me?.club_id||null},comp,phase:phase(room),window:win,cal:await calInfo(pool,room),clubs,managers:mans,prizes:CF.prizes,fmt:{n_clubs:L.CLUBS.length,league_rounds:LEAGUE_END,turno1_end:L.TURNO1_END(),mid_round:MID_ROUND,total_matchdays:C.TOTAL_MD,europe_lp:8},meta_need:CF.meta_onze||6,pre_need:M.PRE_NEED,evolution:{enabled:EVO.enabled,description:EVO.description}});}));
+  s.json({comps,room:{code:room.code,name:room.name,status:room.status,season:room.season,market_day:room.market_day,current_matchday:room.current_matchday||0},admin:room.owner_id===r.user.id||!!r.user.admin,me:{nick:r.user.nick,club_id:me?.club_id||null},comp,phase:phase(room),window:win,cal:await calInfo(pool,room),clubs,managers:mans,prizes:CF.prizes,fmt:{n_clubs:L.CLUBS.length,league_rounds:LEAGUE_END,turno1_end:L.TURNO1_END(),mid_round:MID_ROUND,total_matchdays:C.TOTAL_MD,europe_lp:C.EUROPE_GAMES,europe_n:C.EUROPE_N,europe_lp_rounds:C.EUROPE_LP_ROUNDS},meta_need:CF.meta_onze||6,pre_need:M.PRE_NEED,evolution:{enabled:EVO.enabled,description:EVO.description}});}));
  // Robson 04/11: aba Evolução – elenco do usuário com o progresso até o próximo +1 (só leitura, regras em evolution.js)
  // Somente leitura: média de overall do XI titular de todos os clubes (lineup salvo ou XI automático)
  app.get('/api/rooms/:code/zc/xi-medias',auth,wrap(async(r,s)=>{const room=await member(r);const out=[];for(const id of L.CLUBS){const x=await app.locals.xiFor(pool,room.id,id);const o=x.xi.filter(Boolean).map(p=>+p.overall);const avg=o.length?o.reduce((a,b)=>a+b,0)/o.length:0;out.push({club_id:id,club:uni.prepare('SELECT name FROM clubs WHERE id=?').get(id)?.name,avg:+avg.toFixed(2),min:Math.min(...o),max:Math.max(...o),n:o.length,formation:x.formation,xi:x.custom?'salvo':'auto'})}out.sort((a,b)=>b.avg-a.avg);s.json(out)}));
@@ -282,7 +282,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
   else if(st==='pre'&&state==='auction'&&!rm.auction_open&&AG.market_open&&now>=Date.parse(AG.market_open)){await calAction(rm,'auction_close','Agenda automática');console.log('agenda: mercado aberto');}
   const [x]=(await pool.query('SELECT * FROM rooms WHERE id=$1',[rm.id])).rows;if(x.mkt_stage==='pre'&&x.mkt_state==='market'&&new Date(x.mkt_until).getTime()!==Date.parse(AG.market_close)){await pool.query('UPDATE rooms SET mkt_until=$2,version=version+1 WHERE id=$1',[x.id,AG.market_close]);console.log('agenda: fim do mercado ajustado');x.mkt_until=AG.market_close;}
   if(!fixLog++)console.log('FIXSCHED OK',JSON.stringify({status:x.status,mkt_state:x.mkt_state,mkt_until:x.mkt_until,market_close:AG.market_close,round1:app.locals.slotAt?.(1),market_during_rounds:!!AG.pre_market_during_rounds}));
-  // Robson 04/11: janela do meio por horário: mercado abre em market_open (antes da R19), leilão abre/fecha no meio dele, mercado fecha em market_close
+  // Robson 04/11: janela do meio por horário: mercado abre em market_open (depois da R17 e da fase de liga europeia), leilão abre/fecha no meio dele, mercado fecha em market_close
   const MW=MIDW();if(MW.market_open&&rm.status==='season'){const [y]=(await pool.query('SELECT * FROM rooms WHERE id=$1',[rm.id])).rows;
    if(!['mid','end'].includes(y.mkt_stage)&&now>=Date.parse(MW.market_open)&&now<Date.parse(MW.market_close)){await tx(y,async c=>{const [z]=(await c.query('SELECT * FROM rooms WHERE id=$1 FOR UPDATE',[y.id])).rows;if(['mid','end'].includes(z.mkt_stage))return;
      await c.query("UPDATE rooms SET mkt_stage='mid',mkt_state='market',mkt_until=$2,auction_open=false,window_was_open=true,version=version+1 WHERE id=$1",[y.id,MW.market_close]);await note(c,y.id,`🔓 ${CAL.mid.mlabel} aberto até ${M.brt(MW.market_close)} (horário de Brasília). Leilão do meio: ${M.brt(MW.auction_start)} a ${M.brt(MW.auction_close)}.`);});console.log('agenda: mercado do meio aberto');}

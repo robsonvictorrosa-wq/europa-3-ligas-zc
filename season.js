@@ -1,4 +1,4 @@
-// Temporada: 3 ligas (38 rodadas), 3 copas nacionais e 2 europeias, avançadas por jornada global.
+// Temporada: 3 ligas (34 rodadas), 3 copas nacionais e 2 europeias, avançadas por jornada global.
 const S=require('./sim'),E=require('./europa'),C=require('./comps'),{resenha}=require('./resenha');
 module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
  E.loadClubs(uni);
@@ -63,7 +63,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
 
  function cupSeedIds(leagueKey,tables,uniOvr){
   if(tables&&tables[leagueKey])return tables[leagueKey].slice().sort((a,b)=>a.pos-b.pos).map(x=>x.club_id);
-  return uni.prepare('SELECT club_id FROM lib_clubs WHERE league_key=? ORDER BY ovr11 DESC, name').all(leagueKey).map(x=>x.club_id);
+  return uni.prepare('SELECT club_id FROM lib_clubs WHERE league_key=? ORDER BY ovr18 DESC, ovr11 DESC, name').all(leagueKey).map(x=>x.club_id);
  }
 
  // ---------- iniciar temporada ----------
@@ -91,7 +91,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
    }
    const comps={};
    for(const lg of E.LEAGUES){
-    comps['league_'+lg.key]=await mkComp('league',lg.name,38,lg.key);
+    comps['league_'+lg.key]=await mkComp('league',lg.name,C.LEAGUE_ROUNDS,lg.key);
     const rounds=nat[lg.key];
     const vals=[];rounds.forEach((g,i)=>g.forEach(([h,a])=>vals.push([comps['league_'+lg.key].id,i+1,h,a,'league',0,null,false])));
     await insertMatches(c,vals);
@@ -100,8 +100,8 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
     await insertMatches(c,prelim.ida.map(g=>[comps['cup_'+lg.key].id,1,g.home,g.away,'prelim',1,g.tie,false]));
     await insertMatches(c,prelim.volta.map(g=>[comps['cup_'+lg.key].id,2,g.home,g.away,'prelim',2,g.tie,false]));
    }
-   comps.ucl=await mkComp('ucl','Champions League',13,null);
-   comps.el=await mkComp('el','Europa League',13,null);
+   comps.ucl=await mkComp('ucl','Champions League',18,null);
+   comps.el=await mkComp('el','Europa League',18,null);
    const pack=(compId,sched)=>sched.flatMap((g,i)=>g.map(([h,a])=>[compId,i+1,h,a,'league',0,null,false]));
    await insertMatches(c,pack(comps.ucl.id,uclSched));
    await insertMatches(c,pack(comps.el.id,elSched));
@@ -202,7 +202,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
  app.use('/api/rooms/:code/comp/:id',(r,s,n)=>/^\d+$/.test(r.params.id)?n():s.status(404).json({error:'Competição não encontrada'}));
 
  app.get('/api/rooms/:code/comp/:id/table',auth,wrap(async(r,s)=>{const room=await member(r);const [comp]=await q('SELECT * FROM competitions WHERE id=$1 AND room_id=$2',[r.params.id,room.id]);if(!comp)throw fail('Competição não encontrada',404);
-  const view=r.query.view;const t1=19,lr=comp.kind==='league'?38:(comp.kind==='ucl'||comp.kind==='el'?8:0);
+  const view=r.query.view;const t1=comp.kind==='league'?E.TURNO1_END():(comp.kind==='ucl'||comp.kind==='el'?C.EUROPE_LP_ROUNDS:0);const lr=comp.kind==='league'?C.LEAGUE_ROUNDS:(comp.kind==='ucl'||comp.kind==='el'?C.EUROPE_LP_ROUNDS:0);
   const opts={};if(view==='home')opts.side='home';if(view==='away')opts.side='away';if(view==='turno1'){opts.roundFrom=1;opts.roundTo=t1;}if(view==='turno2'){opts.roundFrom=t1+1;opts.roundTo=lr;}
   if(comp.kind==='league')opts.zones=true,opts.zoneFn=E.leagueZone;
   if(comp.kind==='ucl'||comp.kind==='el')opts.zones=true,opts.zoneFn=pos=>pos<=8?'r16':pos<=24?'playoff':null;
@@ -271,7 +271,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
     let pairs;
     if(step.stage==='r16'){
      const prev=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND stage='prelim' AND played",[comp.id])).rows;
-     const w=[];for(let tie=0;tie<4;tie++){const legs=prev.filter(m=>m.tie===tie);const won=legs.find(m=>m.winner);if(!won)return;w[tie]=won.winner;}
+     const nTies=C.cupPairsPrelim(seeds).length;const w=[];for(let tie=0;tie<nTies;tie++){const legs=prev.filter(m=>m.tie===tie);const won=legs.find(m=>m.winner);if(!won)return;w[tie]=won.winner;}
      pairs=C.cupPairsR16(seeds,w);
     }else{
      const from=step.stage==='qf'?'r16':step.stage==='sf'?'qf':'sf';
@@ -297,7 +297,7 @@ module.exports=({app,uni,q,pool,auth,wrap,fail,member,bump,R,M})=>{
     const comp=comps.find(x=>x.kind===kind);if(!comp)continue;
     const [ex]=(await c.query("SELECT 1 FROM matches WHERE comp_id=$1 AND stage=$2 LIMIT 1",[comp.id,step.stage])).rows;
     if(ex)continue;
-    const rnd={playoff:[9,10],r16:[11,12],qf:[13,14],sf:[15,16],final:[17,17]};
+    const rnd={playoff:[10,11],r16:[12,13],qf:[14,15],sf:[16,17],final:[18,18]};
     const [r1,r2]=rnd[step.stage]||[0,0];
     if(step.stage==='playoff'){
      const ms=(await c.query("SELECT * FROM matches WHERE comp_id=$1 AND played AND stage='league'",[comp.id])).rows;

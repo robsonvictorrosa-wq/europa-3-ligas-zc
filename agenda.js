@@ -9,7 +9,7 @@ const at=(ymd,hm)=>`${ymd}T${hm}:00-03:00`;
 const validYmd=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''))&&!isNaN(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s;
 // start = 1º dia da pré-temporada (AAAA-MM-DD, Brasília). Padrão:
 //  dia 0: leilão de pré 12:00–20:00, mercado 21:40 até o dia 4 às 23:59; jornada 1 no dia 5 às 12:00;
-//  2 jornadas por dia (12:00 e 19:00); janela do meio depois da jornada MID_MD (liga R19);
+//  2 jornadas por dia (12:00 e 19:00); janela do meio depois da jornada MID_MD (liga R17 + 9ª europeia);
 //  janela do fim depois da última jornada (sem jogos depois).
 function build(start,{paused=false,prev=BASE}={}){if(!validYmd(start))throw new Error('Data inválida (use AAAA-MM-DD)');
  const slots=(prev.slots&&prev.slots.length?prev.slots:['12:00','19:00']).slice(),n=slots.length;

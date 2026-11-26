@@ -96,5 +96,5 @@ assert.match(ui,/setorLinha\(d\.strength,'neste jogo'\)/);
 assert.match(ui,/setorLinha\(d\.strength\|\|m\.strength,'elenco atual'\)/);
 
 const sw=fs.readFileSync(path.join(__dirname,'../public/sw.js'),'utf8');
-assert.match(sw,/const V='e3-v4'/);
+assert.match(sw,/const V='e3-v5'/);
 console.log('ok: motor usa overall atual (evolução)');

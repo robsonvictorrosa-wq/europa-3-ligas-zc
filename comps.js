@@ -1,8 +1,8 @@
-// Calendário global, chaveamento das copas (20 times) e fase de liga europeia (30 times, 8 jogos).
+// Calendário global, chaveamento das copas (18 times) e fase de liga europeia (27 times, 8 jogos em 9 jornadas).
 const E=require('./europa');
 const {leagueSchedule}=require('./leaguesched');
 
-// Sequência de 65 jornadas (ver DECISOES.md). mid após a 29ª (liga nacional R19).
+// Sequência de 62 jornadas (ver DECISOES.md). mid após a 28ª (liga nacional R17 + 9ª jornada europeia).
 function buildPlan(){
  const p=[];
  const L=(r)=>p.push({kind:'league',round:r,label:`Liga nacional – rodada ${r}`});
@@ -10,72 +10,61 @@ function buildPlan(){
  const EK=(st,leg)=>p.push({kind:'europe_ko',stage:st,leg,label:`${E.STAGE_NAMES[st]} europeia`+(st==='final'?'':(leg===1?' (ida)':' (volta)'))});
  const C=(st,leg)=>p.push({kind:'cup',stage:st,leg,label:`Copa nacional – ${E.STAGE_NAMES[st]}`+(leg===1?' (ida)':' (volta)')});
  for(let i=0;i<8;i++){L(2*i+1);L(2*i+2);U(i+1);}
- C('prelim',1);L(17);C('prelim',2);L(18);L(19);
- const midAfter=p.length; // 29
- EK('playoff',1);L(20);EK('playoff',2);L(21);
- EK('r16',1);L(22);EK('r16',2);L(23);
- C('r16',1);L(24);C('r16',2);L(25);
- EK('qf',1);L(26);EK('qf',2);L(27);
- C('qf',1);L(28);C('qf',2);
- EK('sf',1);L(29);EK('sf',2);L(30);
- C('sf',1);L(31);C('sf',2);
- for(let r=32;r<=38;r++)L(r);
+ C('prelim',1);L(17);C('prelim',2);U(9);
+ const midAfter=p.length; // 28
+ EK('playoff',1);L(18);EK('playoff',2);L(19);
+ EK('r16',1);L(20);EK('r16',2);L(21);
+ C('r16',1);L(22);C('r16',2);L(23);
+ EK('qf',1);L(24);EK('qf',2);L(25);
+ C('qf',1);L(26);C('qf',2);
+ EK('sf',1);L(27);EK('sf',2);L(28);
+ C('sf',1);L(29);C('sf',2);
+ for(let r=30;r<=34;r++)L(r);
  EK('final',1);C('final',1);C('final',2);
  return p.map((x,i)=>({...x,matchday:i+1,mid_after:i+1===midAfter}));
 }
 const PLAN=buildPlan();
 const TOTAL_MD=PLAN.length;
 const MID_MD=PLAN.find(s=>s.mid_after).matchday;
-const LEAGUE_ROUNDS=38;
+const LEAGUE_ROUNDS=34;
 
-// Fase de liga europeia: grafo circulante com diferenças 1,3,5,7 (ciclos pares) em 30 times.
-// Cada time joga 8 (4 em casa, 4 fora), sem repetir adversário. 8 jornadas × 15 jogos.
+// Fase de liga europeia com 27 times, 8 jogos cada (4 casa, 4 fora), 9 jornadas × 12 jogos.
+// Construção: times = resíduo (0..8) + 9×camada (0..2). Na jornada r folgam r, r+9 e r+18
+// (cada time folga 1 vez). Os 8 resíduos restantes são emparelhados pela fatoração quase
+// perfeita de K_9 ({r+k, r−k} para k=1..4); entre dois resíduos joga-se camada com camada.
+// Mando: o time do resíduo i joga em casa contra j se (j−i mod 9) ∈ {1,2,3,4}.
+const EUROPE_N=27,EUROPE_LP_ROUNDS=9,EUROPE_GAMES=8;
 function europeLeaguePhase(clubs){
- if(clubs.length!==30)throw new Error('europe League phase: 30 clubes');
- const n=30,diffs=[1,3,5,7],mds=[];
- for(const d of diffs){
-  const seen=new Set();const edges=[];
-  for(let i=0;i<n;i++){
-   const j=(i+d)%n;const a=Math.min(i,j),b=Math.max(i,j);const k=a+','+b;
-   if(seen.has(k))continue;seen.add(k);edges.push([i,j]); // 30 arestas por diferença? cycle has n edges
-  }
-  // Reconstrói os ciclos e fatia em 2 emparelhamentos perfeitos (arestas pares/ímpares de cada ciclo).
-  const adj=new Map();for(const [a,b] of edges){(adj.get(a)??adj.set(a,[]).get(a)).push(b);(adj.get(b)??adj.set(b,[]).get(b)).push(a);}
-  const vis=new Set(),cycles=[];
-  for(let s=0;s<n;s++){
-   if(vis.has(s))continue;const cyc=[s];vis.add(s);let prev=-1,cur=s;
-   for(;;){const nxt=adj.get(cur).find(x=>x!==prev);if(nxt==null||nxt===s)break;cyc.push(nxt);vis.add(nxt);prev=cur;cur=nxt;}
-   cycles.push(cyc);
-  }
-  const ev=[],od=[];
-  for(const cyc of cycles){
-   for(let i=0;i<cyc.length;i++){
-    const a=cyc[i],b=cyc[(i+1)%cyc.length];
-    // mando: o time de índice menor+d é mandante (i joga i+d fora)
-    const home=(a+d)%n===b?clubs[b]:clubs[a],away=home===clubs[b]?clubs[a]:clubs[b];
-    (i%2?od:ev).push([home,away]);
+ if(clubs.length!==EUROPE_N)throw new Error('europe League phase: 27 clubes');
+ const mds=[];
+ for(let r=0;r<9;r++){
+  const games=[];
+  for(let k=1;k<=4;k++){
+   const i=(r+k)%9,j=(r-k+9)%9;
+   const d=(j-i+9)%9,homeFirst=d>=1&&d<=4;
+   for(let a=0;a<3;a++){
+    const ti=i+9*a,tj=j+9*a;
+    games.push(homeFirst?[clubs[ti],clubs[tj]]:[clubs[tj],clubs[ti]]);
    }
   }
-  if(ev.length!==15||od.length!==15)throw new Error('fatoração europeia d='+d+' ev='+ev.length+' od='+od.length);
-  mds.push(ev,od);
+  if(games.length!==12)throw new Error('jornada europeia r='+r+' jogos='+games.length);
+  mds.push(games);
  }
- if(mds.length!==8)throw new Error('esperadas 8 jornadas');
  return mds;
 }
 
-// Copa de 20 times: preliminar entre os 8 piores (13×20, 14×19, 15×18, 16×17), depois 16 (12 melhores + 4 vencedores).
+// Copa de 18 times: preliminar entre os 4 piores (15×18, 16×17), depois 16 (top 14 + 2 vencedores).
 // Todas as fases ida e volta; o melhor joga a volta em casa.
 function cupPairsPrelim(seeded){ // seeded[0]=melhor
- const p=[];for(let i=0;i<4;i++)p.push([seeded[12+i],seeded[19-i]]); // 13v20 ... 16v17 (ida na casa do pior)
- return p;
+ return [[seeded[14],seeded[17]],[seeded[15],seeded[16]]]; // 15v18, 16v17 (ida na casa do pior)
 }
-function cupPairsR16(seeded,prelimWinners){ // prelimWinners: winner of 13v20, 14v19, 15v18, 16v17
- const w=prelimWinners; // [W13-20, W14-19, W15-18, W16-17]
+function cupPairsR16(seeded,prelimWinners){ // prelimWinners: [W15/18, W16/17]
+ const w=prelimWinners;
  return [
-  [seeded[0],w[3]], // 1 vs W16/17
-  [seeded[1],w[2]], // 2 vs W15/18
-  [seeded[2],w[1]], // 3 vs W14/19
-  [seeded[3],w[0]], // 4 vs W13/20
+  [seeded[0],w[1]], // 1 vs W16/17
+  [seeded[1],w[0]], // 2 vs W15/18
+  [seeded[2],seeded[13]],
+  [seeded[3],seeded[12]],
   [seeded[4],seeded[11]],
   [seeded[5],seeded[10]],
   [seeded[6],seeded[9]],
@@ -117,4 +106,4 @@ function europeQfPairs(r16Winners){ // ordem das oitavas: caminho do 1º, do 2º
  return [[w[0],w[7]],[w[3],w[4]],[w[1],w[6]],[w[2],w[5]]];
 }
 
-module.exports={PLAN,TOTAL_MD,MID_MD,LEAGUE_ROUNDS,buildPlan,europeLeaguePhase,cupPairsPrelim,cupPairsR16,europePlayoffPairs,europeR16Pairs,europeQfPairs,twoLegs,nationalSchedules};
+module.exports={PLAN,TOTAL_MD,MID_MD,LEAGUE_ROUNDS,EUROPE_N,EUROPE_LP_ROUNDS,EUROPE_GAMES,buildPlan,europeLeaguePhase,cupPairsPrelim,cupPairsR16,europePlayoffPairs,europeR16Pairs,europeQfPairs,twoLegs,nationalSchedules};

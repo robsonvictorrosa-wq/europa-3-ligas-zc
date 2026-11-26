@@ -30,8 +30,8 @@ function fromFixtures(fx,clubId){
       for(const g of prelim.volta)pushPair(out,clubId,g.home,g.away,{comp_kind:'cup',comp:lg.cup,comp_key:'cup-'+lg.key,round:2,stage:'prelim',leg:2,tie:g.tie,played:false});
     }
   }
-  if(fx.ucl?.length===30)C.europeLeaguePhase(fx.ucl).forEach((g,i)=>g.forEach(([h,a])=>pushPair(out,clubId,h,a,{comp_kind:'ucl',comp:'Champions League',comp_key:'ucl',round:i+1,stage:'league',leg:0,played:false})));
-  if(fx.el?.length===30)C.europeLeaguePhase(fx.el).forEach((g,i)=>g.forEach(([h,a])=>pushPair(out,clubId,h,a,{comp_kind:'el',comp:'Europa League',comp_key:'el',round:i+1,stage:'league',leg:0,played:false})));
+  if(fx.ucl?.length===27)C.europeLeaguePhase(fx.ucl).forEach((g,i)=>g.forEach(([h,a])=>pushPair(out,clubId,h,a,{comp_kind:'ucl',comp:'Champions League',comp_key:'ucl',round:i+1,stage:'league',leg:0,played:false})));
+  if(fx.el?.length===27)C.europeLeaguePhase(fx.el).forEach((g,i)=>g.forEach(([h,a])=>pushPair(out,clubId,h,a,{comp_kind:'el',comp:'Europa League',comp_key:'el',round:i+1,stage:'league',leg:0,played:false})));
   return out;
 }
 
